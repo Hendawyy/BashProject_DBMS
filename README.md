@@ -62,3 +62,13 @@ To summarize, the progression is from text-based interfaces (dialog) to basic gr
 2. **yad**
 
 ![yad](Images/GUI%20Examples/Tables%20Yad.png)
+
+As beginners in using GUIs with linux, we decided to go with **zenity** for the following reasons:
+
+1. User-Friendly Interface: zenity provides a simple and user-friendly graphical interface with popup windows, making it ideal for beginners.
+
+2. Straightforward Syntax: Creating basic GUIs with zenity requires minimal knowledge of command-line options, making it accessible to beginners without delving into complex scripting.
+
+While **yad** has more advanced features and customization options, it might have a steeper learning curve for beginners. On the other hand, **dialog** provides text-based interfaces, which may be less intuitive for users accustomed to graphical interfaces.
+
+In summary, **zenity** is an excellent choice for beginners due to its simplicity, and easy integration into Linux environments, allowing you to create basic GUIs without much complexity.
