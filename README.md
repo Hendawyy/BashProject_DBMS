@@ -59,6 +59,6 @@ To summarize, the progression is from text-based interfaces (dialog) to basic gr
 
 ![zenity](Images/GUI%20Examples/Tables%20Zenity.jpeg)
 
-1. **yad**
+2. **yad**
 
 ![yad](Images/GUI%20Examples/Tables%20Yad.png)
