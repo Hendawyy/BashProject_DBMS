@@ -6,10 +6,9 @@
 	for now database name are case senstive
 '
 function db_name_check {
-x=$db_name
+x=$REPLY
 #x=$1
-echo $x
-if [[ $x =~ [\'\"\^\#\`\~\$\%\=\+\<\>\|\:\ \(\)\@\;\?\&\*\\\/]+ ]]
+if [[ $x =~ [\'\"\^\\[\#\`\~\$\%\=\+\<\>\|\:\ \(\)\@\;\?\&\*\\\/]+ ]]
 then
         echo "invalid name, avoid using special character"
         echo "like: ws, &, *, @"
@@ -18,13 +17,12 @@ then
         echo "DB name can't start with numbers"
 else
         echo "valid name"
-        mkdir $full_path
+        mkdir $REPLY
 fi
 }
 
-read -p "enter DB name: " db_name #can be replaced with $1 if we have argument
-full_path="$PWD/$db_name"
-if [[ -d $full_path ]]; then			#will return true if DB exists
+read -p "enter DB name: " -e #can be replaced with $1 if we have argument
+if [[ -d $REPLY ]]; then			#will return true if DB exists
   echo "database already exists, try another name."
 else						#DB doesn't exist
 	 db_name_check
