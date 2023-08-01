@@ -31,6 +31,7 @@ When starting this project, I considered using a GUI to provide a more user-frie
  ![zenity](Images/GUI%20Examples/Zenity.jpeg)
 
 3. **yad (Yet Another Dialog)**: yad is an extension of zenity and is designed to offer even more features and flexibility for creating graphical user interfaces in shell scripts. It also uses the GTK+ toolkit like zenity but provides additional capabilities, including built-in support for tables, forms, and more complex GUI elements. With yad, you can create rich, interactive interfaces with buttons, checkboxes, dropdown lists, and custom forms.
+
 ![yad](Images/GUI%20Examples/Yad.jpeg)
 
 To summarize, the progression is from text-based interfaces (dialog) to basic graphical interfaces (zenity) and finally to more feature-rich and complex graphical interfaces (yad). Each tool offers different levels of functionality and complexity, and you can choose the one that best suits your needs when creating GUIs in bash or other shell scripts.
