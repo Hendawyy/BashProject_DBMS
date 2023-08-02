@@ -42,4 +42,7 @@ function check_if_dir_exists {
 	fi
 }
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 5c0095d (refactored the create database file to enhance reusability & added those functions to the component file)
