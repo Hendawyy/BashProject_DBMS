@@ -17,7 +17,7 @@ then
         echo "DB name can't start with numbers"
 else
         echo "valid name"
-        mkdir $REPLY
+        mkdir -p  Databases/$REPLY
 fi
 }
 
