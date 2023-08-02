@@ -1,6 +1,4 @@
 #!/bin/bash
-<<<<<<< HEAD
-
 
 source components.sh
 
@@ -68,8 +66,6 @@ create_database
 # fun_name: create_data_base
 : 'desc: a script to check if a directory (database) exists if not it creates the database, else it return "data base already exist try another name" 
 '
-
->>>>>>> 5c0095d (refactored the create database file to enhance reusability & added those functions to the component file)
 function create_data_base {
 read -p "enter DB name: " -e
 rtrn=$(check_if_dir_exists $REPLY)
