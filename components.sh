@@ -12,4 +12,34 @@ function chckNameRegex() {
   fi
 }
 
+function check_special_char {
+x=$1
+if [[ $x =~ [\'\"\^\\[\#\`\~\$\%\=\+\<\>\|\:\ \(\)\@\;\?\&\*\\\/]+ ]]
+then
+	echo true
+else
+	echo false
+fi
+}
+
+
+function check_if_name_starts_with_number {
+if [[ $1 =~ ^[0-9] ]]
+then
+	echo true
+else
+	echo false
+fi
+}
+
+
+function check_if_dir_exists {
+	if [[ -d $1 ]]
+	then
+		echo true
+	else
+		echo false
+	fi
+}
+
 

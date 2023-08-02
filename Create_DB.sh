@@ -30,3 +30,33 @@ function create_database() {
 
 create_database
  
+=======
+
+function create_data_base {
+read -p "enter DB name: " -e
+rtrn=$(check_if_dir_exists $REPLY)
+if [ $rtrn == true ]
+then 
+	echo "DB name already taken"
+else
+	rtrn=$(check_if_name_starts_with_number $REPLY)
+	if [ $rtrn == true ]
+	then
+		echo "DB name can't start with numbers"
+	else
+
+		rtrn=$(check_special_char $REPLY)
+		if [ $rtrn == true ]
+		then
+			echo "invalid name, avoid using special character"
+			echo "like: ws, &, *, @"
+		else
+			mkdir $REPLY
+			echo "database created!!"
+		fi
+	fi
+fi
+}
+
+create_data_base
+#(refactor to the code to enhance its reusability)
