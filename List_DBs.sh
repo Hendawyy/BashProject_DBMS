@@ -1,3 +1,6 @@
 #! /bin/bash
 
-ls -d Databases/* | sed 's|.*/||' | awk '{print $0 ".db"}'
+
+source components.sh
+
+list_databases
