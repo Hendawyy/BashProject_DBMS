@@ -27,6 +27,7 @@ function create_database() {
   done
 }
 
+create_database
 
 # fun_name: create_data_base
 : 'desc: a script to check if a directory (database) exists if not it creates the database, else it return "data base already exist try another name" 
