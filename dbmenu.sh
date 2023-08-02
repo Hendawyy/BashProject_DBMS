@@ -18,13 +18,13 @@ function DBmenu(){
     else
         case $choice in
             "Create a DB" )
-                bash Create_DB.sh;;
+                source Create_DB.sh;;
             "List All DataBases" )
-                bash List_DBs.sh;;
+                source List_DBs.sh;;
             "Connect To A DB" )
-                bash Connect_DB.sh;;
+                source Connect_DB.sh;;
             "Drop DB" )
-                bash Drop_DB.sh;;
+                source Drop_DB.sh;;
             *)
                 zenity --error --text="Invalid choice. Please try again." ;;
         esac
