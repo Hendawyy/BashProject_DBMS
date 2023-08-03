@@ -1,17 +1,5 @@
 #!/bin/bash
 
-function chckNameRegex() {
-  local name=$1
-
-  if [[ ! $name =~ ^[[:alpha:]][[:alnum:]]*$ ]]; then
-    zenity --error --text="Invalid name! It should not start with a number or have special characters."
-    return 1
-  else
-    name=$(echo "$name" | awk '{print tolower($0)}')
-    return 0
-  fi
-}
-
 function check_special_char {
 x=$1
 if [[ $x =~ [\'\"\^\\[\#\`\~\$\%\=\+\<\>\|\:\ \(\)\@\;\?\&\*\\\/]+ ]]
@@ -57,7 +45,7 @@ function list_databases() {
     return
   fi
 
-  zenity --question --text="Do you want to connect to '$selected_db'.db?"
+  zenity --question --text="Do you want to connect to '$selected_db'?"
   response=$?
   if [ $response -eq 0 ]; then
     connect_to_database "$selected_db"
@@ -72,7 +60,7 @@ function connect_to_database() {
   local db_name=$1
 
   cd "Databases/$db_name"
-  echo "You are now connected to the database: $db_name.db"
+  echo "You are now connected to the database: $db_name"
   echo "Current directory: $(pwd)"
 }
 
