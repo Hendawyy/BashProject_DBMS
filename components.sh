@@ -22,7 +22,7 @@ fi
 
 
 function check_if_dir_exists {
-	if [[ -d $1 ]]
+	if [[ -d "Databases/$1" ]]
 	then
 		echo true
 	else
@@ -42,7 +42,6 @@ function list_databases() {
 
   if [ $? -eq 1 ]; then
     DBmenu
-    return
   fi
 
   zenity --question --text="Do you want to connect to '$selected_db'?"
@@ -52,13 +51,11 @@ function list_databases() {
   else
     echo "You chose not to connect to any database."
     DBmenu
-    return
   fi
 }
 
 function connect_to_database() {
   local db_name=$1
-
   cd "Databases/$db_name"
   echo "You are now connected to the database: $db_name"
   echo "Current directory: $(pwd)"
