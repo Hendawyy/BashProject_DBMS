@@ -1,5 +1,7 @@
 #!/bin/bash
 
+
+
 function check_special_char {
 x=$1
 if [[ $x =~ [\'\"\^\\[\#\`\~\$\%\=\+\<\>\|\:\ \(\)\@\;\?\&\*\\\/]+ ]]
@@ -50,15 +52,19 @@ function list_databases() {
   if [ $response -eq 0 ]; then
     connect_to_database "$selected_db"
   else
-    echo "You chose not to connect to any database."
+    zenity --info \
+  --text="You chose not to connect to any database."
     DBmenu
   fi
 }
 
 function connect_to_database() {
-  local db_name=$1
+  local db_name=$(echo "$1" | sed 's/\.db$//')
+
   cd "Databases/$db_name"
-  echo "You are now connected to the database: $db_name"
+  zenity --info \
+  --text="Connected to the database: $db_name"
   echo "Current directory: $(pwd)"
+  source ../../Table_menu.sh
 }
 

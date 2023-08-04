@@ -13,7 +13,6 @@ while true; do
     fi
     
     db_namez=$(echo "$db_name" | awk '{print tolower($0)}')
-    echo $db_namez
     
     
     rtrn=$(check_if_dir_exists $db_namez)

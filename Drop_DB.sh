@@ -1,6 +1,5 @@
 #!/bin/bash
 
-# Function to delete the selected database directory
 function Drop_DB() {
   local database_list=$(ls -d Databases/* | sed 's|.*/||')
 
@@ -23,7 +22,8 @@ function Drop_DB() {
 
   response=$?
   if [ $response -eq 0 ]; then
-    rm -r "Databases/$selected_db"
+    local db=$(echo "$selected_db" | sed 's/\.db$//')
+    rm -r "Databases/$db"
     zenity --info --text="Database '$selected_db' has been successfully deleted."
   else
     zenity --info --text="Deletion of database '$selected_db' has been canceled."
