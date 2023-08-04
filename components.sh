@@ -68,3 +68,93 @@ function connect_to_database() {
   source ../../Table_menu.sh
 }
 
+function check_for_empty_string {
+  if [ -z $1 ]
+  then
+    echo true
+  else
+    echo false
+  fi
+}
+
+function check_for_repeated_col_name {
+  col_name=$1
+  table_name=$2 #file name
+  count=`cut -d : -f 1 $table_name| grep -i ^$col_name$ | wc -l`
+  echo $count  
+}
+
+
+function check_data_type_entry {
+    dt_lower=$(echo "$dt" | awk '{print tolower($0)}')
+    case $dt_lower in
+    varchar)
+    ;;
+    int)
+    ;;
+    date)
+    ;;
+    [[ ^enum(*)$ ]]) # back to this later
+    ;;
+    auto_increment)
+    ;;
+    *)
+    echo "invalid data type"
+    ;;
+    esac
+}
+
+
+function arguments_checker {
+arguments=`echo $* | cut -d ' ' -f 3-`
+arg_name=$1
+#check for naming constraints
+rtrn=$(check_special_char $1)
+if [ $rtrn == true ]
+then
+    echo "name can't contain a special characters"
+    return 1
+else
+    rtrn=$(check_if_name_starts_with_number $1)
+    if [ $rtrn == true ]
+    then
+        echo "name can't start with numbers"
+        return 1
+    else
+        rtrn=$(check_for_empty_string $1)
+        if [ $rtrn == true ]
+        then
+            echo "column name must be provided"
+            return 1
+    fi
+fi
+dt=$2
+# check if data type is valid using case state
+rtrn=$(check_data_type_entry $2)
+if [ rtrn == "invalid data type" ]
+then
+    echo "invalid data type"
+    return 1
+fi
+pk=`echo $arguments | grep -i primary_key| wc -l`
+nn=`echo $arguments | grep -i not_null| wc -l`
+uq=`echo $arguments | grep -i unique | wc -l`
+inc=`echo $arguments | grep -i auto_increment |wc -l`
+line_to_be_added="$1:$2"
+for constraint in $pk $inc $uq $nn
+do
+        if [ $constraint -eq 1 ]
+        then
+                line_to_be_added="$line_to_be_added:y"
+        elif [ $constraint -eq 0 ]
+        then
+                line_to_be_added="$line_to_be_added:n"
+        else
+                echo "too many arguments after $1"
+
+        fi
+done
+echo $line_to_be_added
+}
+
+

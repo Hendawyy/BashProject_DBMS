@@ -8,7 +8,7 @@
 # 2- table_name.md
 # after everything has been created sucssesfuly >>> we ask for the table attribute
 #add those attributes to the .md file and check if
-# 1- attribute was repeated
+# 1- attribute name was repeated
 # 2- atleast and only 1 primary key entry
 # 3- data type for each attribute was set (if not ... we might set it text as default)
 # 4- every attribute can be null by default if it wasnt pkey 
@@ -22,9 +22,8 @@
 # first field will be number which represents where is that field should be inserted in data table
 # 2nd field is the attribute name
 # 3rd field is the data type
-# 4th and above will be for constraints so..
 # 4th will be the primarykey which will be pk if it is a pk
-# 5th can be fk if we want or maybe autoincreament or both 
+# 5th autoincreament 
 # 6th will be unique >> if it was unique will have the value y otherwise empty
 # 7th null or not
 # if we want to add more constraints in future we can just add more fields
