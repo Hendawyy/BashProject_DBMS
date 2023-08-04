@@ -11,6 +11,7 @@ fi
 }
 
 
+
 function check_if_name_starts_with_number {
 if [[ $1 =~ ^[0-9] ]]
 then
