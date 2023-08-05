@@ -94,8 +94,8 @@ function check_data_type_entry {
     ;;
     date)
     ;;
-    [[ ^enum(*)$ ]]) # back to this later
-    ;;
+    #[[ ^enum(*)$ ]]) # back to this later
+    #;;
     auto_increment)
     ;;
     *)
@@ -126,6 +126,7 @@ else
         then
             echo "column name must be provided"
             return 1
+        fi
     fi
 fi
 dt=$2
@@ -151,10 +152,17 @@ do
                 line_to_be_added="$line_to_be_added:n"
         else
                 echo "too many arguments after $1"
-
         fi
 done
 echo $line_to_be_added
 }
 
 
+function append_attribute {
+filtered_line=`echo $* | cut -d \( -f 2 |cut -d \) -f 1`
+echo $filtered_line | sed 's/,/\n/g' > temp.md
+table_name=`echo $* | cut -d " " -f 3`
+rm $table_name.md
+while read line; do arguments_checker $line >> $table_name.md; done < temp.md
+rm temp.md
+}
