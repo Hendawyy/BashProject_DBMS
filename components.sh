@@ -86,17 +86,23 @@ function check_for_repeated_col_name {
 
 
 function check_data_type_entry {
-    dt_lower=$(echo "$dt" | awk '{print tolower($0)}')
+    dt_lower=$(echo "$1" | awk '{print tolower($0)}')
     case $dt_lower in
-    varchar)
+    number)
     ;;
-    int)
+    float)
     ;;
-    date)
+    string)
     ;;
-    #[[ ^enum(*)$ ]]) # back to this later
-    #;;
     auto_increment)
+    ;;
+    "date")
+    ;;
+    date_time)
+    ;;
+    email)
+    ;;
+    text)
     ;;
     *)
     echo "invalid data type"
@@ -131,7 +137,7 @@ else
 fi
 dt=$2
 # check if data type is valid using case state
-rtrn=$(check_data_type_entry $2)
+rtrn=$(check_data_type_entry $dt)
 if [ rtrn == "invalid data type" ]
 then
     echo "invalid data type"
