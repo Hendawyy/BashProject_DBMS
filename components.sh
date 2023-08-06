@@ -166,3 +166,52 @@ rm $table_name.md
 while read line; do arguments_checker $line >> $table_name.md; done < temp.md
 rm temp.md
 }
+
+
+function data_type {
+
+shopt -s extglob
+
+input=$*
+
+date_time="^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1]) (2[0-3]|[0-1][0-9]):[0-5][0-9]:[0-5][0-9]$"
+
+if  [[ $input =~ ^[1-9][0-9]*$ ]]
+then
+        echo "number" 
+elif [[ $input =~ ^[-+]?[0-9]+\.?[0-9]*$ ]]
+then
+        echo "float"
+elif [[ $input =~ ^[a-zA-Z]{0,255}$ ]]
+then
+        echo "string"
+elif [[ $input =~ ^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$ ]]
+then
+        echo "date"
+elif [[ $input =~ $date_time ]]
+then
+        echo "date time"
+
+elif [[ $input =~ ^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,4}$ ]]
+then
+        echo "email"
+else
+        echo "text"
+fi
+}
+
+
+function data_type_match {
+        #should path to it the expected data type
+        #then the input
+expected_data_type=$1
+data_type=$(data_type $2)
+if [ $expected_data_type == $data_type ]
+then
+        echo true
+else
+        echo false
+fi
+}
+
+#data_type_match "date" "2023-13-15"
