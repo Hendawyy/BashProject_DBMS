@@ -11,7 +11,7 @@ function Insert_Table() {
     --column="Tables" $Tables_list)
 
   if [ $? -eq 1 ]; then
-    Insert_Table
+    Menu_Table $DB_name
   fi
 
   table_name=$selected_tb
@@ -66,7 +66,7 @@ function Insert_Table() {
       column_value=$(zenity --calendar --title="Select Date" --text="Select date for $column_name:")
       column_data+=("$column_value")
     elif [[ "$data_type" == "Current--Date--Time" ]]; then
-      current_datetime=$(date)
+      current_datetime=$(date +"%Y-%m-%d---%H:%M:%S")
       column_data+=("$current_datetime")
     fi
   done
