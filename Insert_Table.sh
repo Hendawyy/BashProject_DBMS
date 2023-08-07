@@ -52,8 +52,7 @@ for i in "${!column_name[@]}"; do
   elif [[ "${data_type[i]}" == "Current Date Time" ]]; then
   fi
 done
-data_type_options=("ID--Int--Auto Inc." "INT" "Double" "Varchar" "Enum" "Phone" "Email" "Password" "Date" "Current Date Time")
-  
+ 
 insert_line=$(IFS=':'; echo "${column_data[*]}")
 
 echo "$insert_line" >> "$table_name/$table_name"
