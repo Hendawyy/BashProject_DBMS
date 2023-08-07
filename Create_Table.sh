@@ -23,8 +23,7 @@ function Create_Table() {
   fi
 
   mkdir -p "$table_name"
-  
-  touch "$table_name/$table_name"
+  touch "$table_name/$table_name" "$table_name/$table_name.md"
   echo "Table Name: $table_name" > "$table_name/$table_name.md"
   echo "Number of Columns: $num_columns" >> "$table_name/$table_name.md"
   echo -e "attribute_name : data_type : primary_key(y/n) : unique(y/n) : nullable(y/n)" >> "$table_name/$table_name.md"
@@ -64,7 +63,7 @@ function Create_Table() {
       Create_Table
     fi
 
-    data_type_options=("ID--Int--Auto Inc." "INT" "Double" "Varchar" "Enum" "Phone" "Email" "Password" "Date" "Current Date Time")
+    data_type_options=("ID--Int--Auto--Inc." "INT" "Double" "Varchar" "Enum" "Phone" "Email" "Password" "Date" "Current--Date--Time")
     data_type=$(zenity --list \
       --title="Create Table $table_name" \
       --text="Select data type for Column $i:" \
@@ -75,8 +74,15 @@ function Create_Table() {
       rm -r "$table_name"
       Create_Table
     fi
-
-    
+   if [[ "$data_type" == "Enum" ]]; then
+      num_enum_values=$(zenity --entry --title="Enum Values" --text="Enter the number of ENUM values for $column_name:")
+      enum_values=()
+      for ((j = 1; j <= num_enum_values; j++)); do
+        enum_value=$(zenity --entry --title="Enter ENUM Value" --text="Enter ENUM value $j for $column_name:")
+        enum_values+=("$enum_value")
+      done
+      formatted_enum="{${enum_values[*]}}" 
+     fi 
     columns+=("$column_name")
     data_types+=("$data_type")
     nullable+=("$is_nullable")
@@ -110,9 +116,11 @@ function Create_Table() {
     rm -r "$table_name"
   fi
 
-  for ((i = 0; i < ${#columns[@]}; i++)); do
-    echo -e "${columns[i]} : ${data_types[i]} : ${primary_keys[i]} : ${unique[i]} : ${nullable[i]}" >> "$table_name/$table_name.md"
-  done
+
+for ((i = 0; i < ${#columns[@]}; i++)); do
+    echo -n "${columns[i]} : " >> "$table_name/$table_name"
+    echo -e "${columns[i]} : ${data_types[i]} : ${primary_keys[i]} : ${unique[i]} : ${nullable[i]}" >> "$table_name/$table_name.md" $([[ "${data_types[i]}" == "Enum" ]] && echo ": ${formatted_enum}")
+ done
 
   zenity --info --text="Table '$table_name' created successfully!"
 }
