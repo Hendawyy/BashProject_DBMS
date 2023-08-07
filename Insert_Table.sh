@@ -14,10 +14,11 @@ function Insert_Table() {
     --column="Tables" $Tables_list)
 
   table_name=$selected_tb
-  echo $table_name
   metadata_file="$table_name/$table_name.md"
   column_data=()
-
+  
+  
+  form_fields=""
   while IFS= read -r line; do
     if [[ $line == "attribute_name"* ]]; then
       continue  
@@ -33,31 +34,45 @@ function Insert_Table() {
       "ID--Int--Auto Inc.")
         ;;
       "INT")
+        form_fields+="--add-entry=\"$column_info (INT)\" "
         ;;
       "Double")
+        form_fields+="--add-entry=\"$column_info (Double)\" "
         ;;
       "Varchar")
+        form_fields+="--add-entry=\"$column_info (Varchar)\" "
         ;;
       "Enum")
+        form_fields+="--add-entry=\"$column_info (Enum)\" "
         ;;
       "Email")
+        form_fields+="--add-entry=\"$column_info (Email)\" "
         ;;
       "Password")
+        form_fields+="--add-entry=\"$column_info (Password)\" "
         ;;
       "Date")
+        form_fields+="--add-Calendar=\"$column_info (Date)\" "
         ;;
       "Current Date Time")
         ;;
       "Phone")
+        form_fields+="--add-entry=\"$column_info (Phone)\" "
         ;;
     esac
   done < "$metadata_file"
 
-  insert_line=$(IFS=':'; echo "${column_data[*]}")
+  form_fields+="--cancel-label=Go Back"
+  
+  user_input=$(zenity --forms \
+    --title="Insert Data" \
+    --text="Enter data for each column:" \
+    $form_fields)
 
-  echo "$insert_line" >> "$table_name/$table_name"
+  if [ $? -eq 1 ]; then
+    Insert_Table
+  fi
 
-  zenity --info --text="Data inserted successfully!"
 }
 
 Insert_Table
