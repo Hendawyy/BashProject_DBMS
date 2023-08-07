@@ -27,13 +27,12 @@ function Create_Table() {
   touch "$table_name/$table_name"
   echo "Table Name: $table_name" > "$table_name/$table_name.md"
   echo "Number of Columns: $num_columns" >> "$table_name/$table_name.md"
-  echo -e "attribute_name : data_type : primary_key(y/n) : auto_increment(y/n) : unique(y/n) : nullable(y/n)" >> "$table_name/$table_name.md"
+  echo -e "attribute_name : data_type : primary_key(y/n) : unique(y/n) : nullable(y/n)" >> "$table_name/$table_name.md"
   columns=()  
   data_types=()  
   primary_keys=()  
   nullable=() 
   unique=()  
-  auto_increment=() 
 
   for ((i = 1; i <= num_columns; i++)); do
     column_info=$(zenity --forms \
@@ -77,17 +76,11 @@ function Create_Table() {
       Create_Table
     fi
 
-    if [ "$data_type" == "ID--Int--Auto Inc." ]; then
-      is_auto_increment="y"
-    else
-      is_auto_increment="n"
-    fi
-
+    
     columns+=("$column_name")
     data_types+=("$data_type")
     nullable+=("$is_nullable")
     unique+=("$is_unique")
-    auto_increment+=("$is_auto_increment")
   done
 
   selected_pk_column=$(zenity --list \
@@ -118,7 +111,7 @@ function Create_Table() {
   fi
 
   for ((i = 0; i < ${#columns[@]}; i++)); do
-    echo -e "${columns[i]} : ${data_types[i]} : ${primary_keys[i]} : ${auto_increment[i]} : ${unique[i]} : ${nullable[i]}" >> "$table_name/$table_name.md"
+    echo -e "${columns[i]} : ${data_types[i]} : ${primary_keys[i]} : ${unique[i]} : ${nullable[i]}" >> "$table_name/$table_name.md"
   done
 
   zenity --info --text="Table '$table_name' created successfully!"
