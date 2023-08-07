@@ -1,7 +1,7 @@
 #!/bin/bash
 
 function Drop_DB() {
-  local database_list=$(ls -d Databases/* | sed 's|.*/||')
+  local database_list=$(ls Databases/)
 
   local database_list_with_extension=""
     for db in $database_list; do

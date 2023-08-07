@@ -36,7 +36,7 @@ function check_if_dir_exists {
 
 
 function list_databases() {
-  local database_list=$(ls -d Databases/* | sed 's|.*/||' | awk '{print $0 ".db"}')
+  local database_list=$(ls  Databases/ | awk '{print $0 ".db"}')
 
   selected_db=$(zenity --list \
     --title="List of Databases" \
@@ -221,3 +221,23 @@ fi
 }
 
 #data_type_match "date" "2023-13-15"
+
+
+
+function list_tables() {
+  current_dir=$(pwd)
+
+  DB_name=$(basename "$current_dir")
+
+  local Tables_list=$(ls "$current_dir/")
+
+  selected_tb=$(zenity --list \
+    --title="List of Tables in $DB_name.db" \
+    --text="Choose a Table:" \
+    --column="Tables" $Tables_list)
+
+  if [ $? -eq 1 ]; then
+    Menu_Table $DB_name
+  fi
+
+}

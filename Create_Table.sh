@@ -65,7 +65,7 @@ function Create_Table() {
       Create_Table
     fi
 
-    data_type_options=("ID--Int--Auto Inc." "INT" "Double" "Varchar" "Email" "Password" "Date" "Current Date Time")
+    data_type_options=("ID--Int--Auto Inc." "INT" "Double" "Varchar" "Enum "Phone" "Email" "Password" "Date" "Current Date Time")
     data_type=$(zenity --list \
       --title="Create Table $table_name" \
       --text="Select data type for Column $i:" \
