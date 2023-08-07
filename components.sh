@@ -196,7 +196,7 @@ then
         echo "date"
 elif [[ $input =~ $date_time ]]
 then
-        echo "date time"
+        echo "date_time"
 
 elif [[ $input =~ ^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,4}$ ]]
 then
@@ -211,7 +211,8 @@ function data_type_match {
         #should path to it the expected data type
         #then the input
 expected_data_type=$1
-data_type=$(data_type $2)
+shift
+data_type=$(data_type $*)
 if [ $expected_data_type == $data_type ]
 then
         echo true
@@ -241,3 +242,68 @@ function list_tables() {
   fi
 
 }
+
+
+#! /bin/bash
+source com.sh
+
+function check_for_unique {
+    col=$1
+    file=$2
+    shift 2
+    data=$*
+    count=`cat $file |cut -d : -f $col| grep -i ^"$data"$ | wc -l`
+    if [ $count -eq 0 ]
+    then
+        echo true
+    else
+        echo false
+    fi
+}
+
+function check_for_not_null {
+    input=$*
+    if [ -z "$input" ]
+    then
+        echo false    #empty string = null
+    else
+        echo true
+    fi
+}
+
+function check_for_pk {
+    col=$1
+    file=$2
+    shift 2
+    data=$*
+    rtrn=$(check_for_not_null $data)
+    if [ $rtrn == true ]
+    then
+        rtrn=$(check_for_unique "$col" "$file" "$data")
+        if [ $rtrn == true ]
+        then
+            	echo true
+	else
+		echo false
+        fi
+    else
+        echo false
+    fi
+}
+
+function check_for_data_type {
+    col=$1
+    file=$2
+    shift 2
+    data=$*
+    expected_data_type=`awk -v mycol=$col -F ":" '{ if (NR==mycol)
+    {print $2}
+}
+    ' $file`
+    rtrn=$(data_type_match $expected_data_type $data)
+    echo $rtrn
+}
+#check_for_data_type 8 ./Student/Student.md "2023-12-32 23:59:59"
+#check_for_not_null                 
+#check_for_unique 1 /etc/passwd Caster
+#check_for_pk 1 /etc/passwd asdasq asfsaga asd
