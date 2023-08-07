@@ -27,7 +27,7 @@ function Create_Table() {
   touch "$table_name/$table_name"
   echo "Table Name: $table_name" > "$table_name/$table_name.md"
   echo "Number of Columns: $num_columns" >> "$table_name/$table_name.md"
-
+  echo -e "attribute_name : data_type : primary_key(y/n) : auto_increment(y/n) : unique(y/n) : nullable(y/n)" >> "$table_name/$table_name.md"
   columns=()  
   data_types=()  
   primary_keys=()  
@@ -106,7 +106,6 @@ function Create_Table() {
   for ((i = 0; i < ${#columns[@]}; i++)); do
     if [ "${columns[i]}" == "$selected_pk_column" ]; then
       primary_keys+=("y")
-      break
     else
       primary_keys+=("n")
     fi
@@ -119,7 +118,6 @@ function Create_Table() {
   fi
 
   for ((i = 0; i < ${#columns[@]}; i++)); do
-    echo -e "attribute_name : data_type : primary_key(y/n) : auto_increment(y/n) : unique(y/n) : nullable(y/n)" >> "$table_name/$table_name.md"
     echo -e "${columns[i]} : ${data_types[i]} : ${primary_keys[i]} : ${auto_increment[i]} : ${unique[i]} : ${nullable[i]}" >> "$table_name/$table_name.md"
   done
 
