@@ -320,6 +320,7 @@ function Select_All() {
 
   headers=$(awk -F: 'NR>3 {print $1}' "$data_file.md")
   num_fields=$(awk -F: 'NR>3 {print NR-3}' "$data_file.md" | wc -l)
+  pk=$(awk -F':' '$3 == "y" { print $1 }' "$data_file.md")
 
   formatted_data="<html>
   <head>
@@ -349,6 +350,7 @@ function Select_All() {
   <body>
   <center>
     <h2>$table_name Table</h2>
+    <h5 style='color:crimson'><b>$pk</b> is the <b>PK</b> for this Table</h5>
   </center>
     <table>
       <tr>"

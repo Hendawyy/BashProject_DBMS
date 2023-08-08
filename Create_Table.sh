@@ -24,9 +24,9 @@ function Create_Table() {
 
   mkdir -p "$table_name"
   touch "$table_name/$table_name" "$table_name/$table_name.md"
-  echo "Table Name: $table_name" > "$table_name/$table_name.md"
-  echo "Number of Columns: $num_columns" >> "$table_name/$table_name.md"
-  echo -e "attribute_name : data_type : primary_key(y/n) : unique(y/n) : nullable(y/n)" >> "$table_name/$table_name.md"
+  echo "Table Name:$table_name" > "$table_name/$table_name.md"
+  echo "Number of Columns:$num_columns" >> "$table_name/$table_name.md"
+  echo -e "attribute_name:data_type:primary_key(y/n):unique(y/n):nullable(y/n)" >> "$table_name/$table_name.md"
   columns=()  
   data_types=()  
   primary_keys=()  
@@ -118,8 +118,7 @@ function Create_Table() {
 
 
 for ((i = 0; i < ${#columns[@]}; i++)); do
-    echo -n "${columns[i]} : " >> "$table_name/$table_name"
-    echo -e "${columns[i]} : ${data_types[i]} : ${primary_keys[i]} : ${unique[i]} : ${nullable[i]}" >> "$table_name/$table_name.md" $([[ "${data_types[i]}" == "Enum" ]] && echo ": ${formatted_enum}")
+    echo -e "${columns[i]}:${data_types[i]}:${primary_keys[i]}:${unique[i]}:${nullable[i]}" >> "$table_name/$table_name.md" $([[ "${data_types[i]}" == "Enum" ]] && echo ":${formatted_enum}")
  done
 
   zenity --info --text="Table '$table_name' created successfully!"
