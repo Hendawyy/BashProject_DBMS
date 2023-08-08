@@ -304,3 +304,83 @@ function check_for_data_type {
 #check_for_not_null                 
 #check_for_unique 1 /etc/passwd Caster
 #check_for_pk 1 /etc/passwd asdasq asfsaga asd
+
+function Select_All() {
+  selected_tb=$(zenity --list \
+    --title="List of Tables in $DB_name.db" \
+    --text="Choose a Table:" \
+    --column="Tables" $Tables_list)
+
+  if [ $? -eq 1 ]; then
+    Menu_Table "$DB_name"
+  fi
+
+  table_name="$selected_tb"
+  data_file="../$DB_name/$table_name/$table_name"
+
+  headers=$(awk -F: 'NR>3 {print $1}' "$data_file.md")
+  num_fields=$(awk -F: 'NR>3 {print NR-3}' "$data_file.md" | wc -l)
+
+  formatted_data="<html>
+  <head>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+      }
+      table {
+        border-collapse: collapse;
+        width: 100%;
+      }
+      th, td {
+        border: 1px solid #dddddd;
+        text-align: left;
+        padding: 8px;
+      }
+      th {
+        background-color: #f2f2f2;
+      }
+      .icons {
+        font-size: 20px;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <center>
+  <body>
+  <center>
+    <h2>$table_name Table</h2>
+  </center>
+    <table>
+      <tr>"
+
+  for header in $headers; do
+    formatted_data+="<th>$header</th>"
+  done
+
+  formatted_data+="<th>Actions</th>"
+  formatted_data+="</tr>"
+
+  while IFS= read -r line; do
+    IFS=":" read -ra fields <<< "$line"
+    formatted_data+="<tr>"
+
+    for ((i = 0; i < num_fields; i++)); do
+      formatted_data+="<td>${fields[i]}</td>"
+    done
+
+    formatted_data+="<td>&#9997; &#128465;</td>"
+    formatted_data+="</tr>"
+  done < "$data_file"
+
+  formatted_data+="</table>
+  </body>
+  </center>
+</html>"
+
+  zenity --text-info --title="$table_name Table" --width=1080 --height=950 \
+    --html --filename=<(echo "$formatted_data")
+
+  if [ $? -eq 1 ]; then
+    Menu_Table "$DB_name"
+  fi
+}
