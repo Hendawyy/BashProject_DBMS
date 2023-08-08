@@ -244,9 +244,6 @@ function list_tables() {
 }
 
 
-#! /bin/bash
-source com.sh
-
 function check_for_unique {
     col=$1
     file=$2
