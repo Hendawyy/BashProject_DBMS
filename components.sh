@@ -384,3 +384,105 @@ function Select_All() {
     Menu_Table "$DB_name"
   fi
 }
+
+
+function Select_Columns() {
+  selected_tb=$(zenity --list \
+      --title="List of Tables in $DB_name.db" \
+      --text="Choose a Table:" \
+      --column="Tables" $Tables_list)
+
+    if [ $? -eq 1 ]; then
+      Menu_Table "$DB_name"
+    fi
+  local table_name="$selected_tb"
+  local data_file="../$DB_name/$table_name/$table_name"
+
+  headers=$(awk -F: 'NR>3 {print $1}' "$data_file.md")
+  nf=$(awk -F: 'NR>3 {print NR-3":"$1}' "$data_file.md")
+  wcl=$(awk ' END {print NR}' "$data_file")
+
+  for header in $headers; do
+    checklist_options+=(FALSE "$header")
+  done
+  selected_headers=$(zenity --list \
+    --title="Columns" \
+    --text="Choose the Columns you want to select :" \
+    --checklist \
+    --column="Check" \
+    --column="Column" \
+    "${checklist_options[@]}")
+  checklist_options=()
+
+  if [ $? -eq 0 ]; then
+    echo "Selected headers: $selected_headers"
+    IFS='|' read -ra selected_headers_array <<< "$selected_headers"
+    selected_headers_table="<html>
+    <head>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+      }
+      table {
+        border-collapse: collapse;
+        width: 100%;
+      }
+      th, td {
+        border: 1px solid #dddddd;
+        text-align: left;
+        padding: 8px;
+      }
+      th {
+        background-color: #f2f2f2;
+      }
+    </style>
+    </head>
+    <center>
+    <body>
+    <center>
+      <h2>$table_name Table</h2>
+    </center>
+    <table>
+      <tr>"
+
+    field_indices=()
+    for selected_header in "${selected_headers_array[@]}"; do
+      selected_headers_table+="<th>$selected_header</th>"
+      field_index=$(echo "$nf" | grep -n "$selected_header" | cut -d ":" -f 1)
+      field_indices+=("$field_index")
+    done
+
+    selected_headers_table+="<th>Actions</th>"
+    selected_headers_table+="</tr>"
+
+    while IFS= read -r line; do
+      IFS=":" read -ra fields <<< "$line"
+      selected_headers_table+="<tr>"
+
+      for field_index in "${field_indices[@]}"; do
+        field_data=${fields[field_index-1]}
+        echo $field_index":"$field_data
+        selected_headers_table+="<td>$field_data</td>"
+      done
+
+      selected_headers_table+="<td>&#9997; &#128465;</td>"
+      selected_headers_table+="</tr>"
+    done < "$data_file"
+
+    selected_headers_table+="</table>
+    </body>
+    </center>
+    </html>"
+
+    zenity --text-info --title="$table_name Table" --width=1080 --height=950 \
+      --html --filename=<(echo "$selected_headers_table")
+
+    if [ $? -eq 1 ]; then
+      Menu_Table "$DB_name"
+    fi
+  fi 
+
+  if [ $? -eq 1 ]; then
+    Menu_Table "$DB_name"
+  fi
+}

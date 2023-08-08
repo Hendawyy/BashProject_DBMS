@@ -7,12 +7,12 @@ function Select_Tb() {
   DB_name=$(basename "$current_dir")
   local Tables_list=$(ls "$current_dir/")
   local type=("All(*)" "Columns")
-  
+
   type=$(zenity --list \
     --title="How do you wish to select for the $DB_name.db" \
     --text="Choose a Method:" \
-    --column="Tables" ${type[*]})
-    
+    --column="Tables" "${type[@]}")
+
   if [ $? -eq 1 ]; then
     Menu_Table "$DB_name"
   fi
@@ -20,7 +20,7 @@ function Select_Tb() {
   if [ "$type" == "All(*)" ]; then
     Select_All
   elif [ "$type" == "Columns" ]; then
-    echo "cols"
+    Select_Columns
   fi
 }
 
