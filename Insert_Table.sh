@@ -17,9 +17,8 @@ function Insert_Table() {
   table_name=$selected_tb
   column_data=()
 
-  column_names=($(awk -F ' : ' 'NR > 3 {print $1}' "../$DB_name/$table_name/$table_name.md"))
-  data_types=($(awk -F ' : ' 'NR > 3 {print $2}' "../$DB_name/$table_name/$table_name.md"))
-
+  column_names=($(awk -F ':' 'NR > 3 {print $1}' "../$DB_name/$table_name/$table_name.md"))
+  data_types=($(awk -F ':' 'NR > 3 {print $2}' "../$DB_name/$table_name/$table_name.md"))
 
   for i in "${!column_names[@]}"; do
     column_name="${column_names[i]}"
@@ -49,7 +48,8 @@ function Insert_Table() {
     column_value=$(zenity --entry --title="Enter Value" --text="Enter value for $column_name (Email):")
     column_data+=("$column_value")
     elif [[ "$data_type" == "Enum" ]]; then
-     enum_values=$(awk -F ' : ' 'NR > 3 {print $6}' "../$DB_name/$table_name/$table_name.md" | tr '{}' ' ')
+     enum_values=$(awk -F ':' 'NR > 3 {print $6}' "../$DB_name/$table_name/$table_name.md"| tr '{}' ' ')
+
     selected_enum_value=$(zenity --list \
         --title="Select ENUM Value" \
         --text="Select ENUM value for $column_name:" \
