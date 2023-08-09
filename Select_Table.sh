@@ -7,21 +7,32 @@ function Select_Tb() {
   DB_name=$(basename "$current_dir")
   local Tables_list=$(ls "$current_dir/")
   local type=("All(*)" "Columns")
+  local con=("Condition" "Conditionless")
 
-  type=$(zenity --list \
+  conn=$(zenity --list \
     --title="How do you wish to select for the $DB_name.db" \
     --text="Choose a Method:" \
-    --column="Tables" "${type[@]}")
+    --column="Tables" "${con[@]}")
 
   if [ $? -eq 1 ]; then
     Menu_Table "$DB_name"
-  fi
+  else
+    type=$(zenity --list \
+      --title="How do you wish to select for the $DB_name.db" \
+      --text="Choose a Method:" \
+      --column="Tables" "${type[@]}")
 
-  if [ "$type" == "All(*)" ]; then
-    Select_All
-  elif [ "$type" == "Columns" ]; then
-    Select_Columns
+    if [ $? -eq 1 ]; then
+      Select_Tb
+    fi
+
+    if [ "$conn" == "Condition" ]; then
+      Select_With_Condition "$type"
+    elif [ "$conn" == "Conditionless" ]; then
+      Select_Without_Condition "$type"
+    fi
   fi
 }
+
 
 Select_Tb

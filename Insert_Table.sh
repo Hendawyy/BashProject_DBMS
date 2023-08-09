@@ -71,7 +71,7 @@ function Insert_Table() {
     fi
   done
 
-  insert_line=$(IFS=':'; echo "${column_data[*]}")
+  insert_line=$(IFS=';'; echo "${column_data[*]}")
   echo "$insert_line" >> "../$DB_name/$table_name/$table_name"
 
   zenity --info --text="Data inserted successfully!"

@@ -13,14 +13,14 @@ function Delete_Data() {
     Select_All
     if [ $? -eq 0 ]; then
 
-      nf=$(awk -F: 'NR>3 {print NR-3":"$1":"$3}' "$data_file.md")
-      index=$(echo "$nf" | awk -F: '$3 == "y" { print $1 }')
-      col=$(echo "$nf" | awk -F: '$3 == "y" { print $2 }')
+      nf=$(awk -F':' 'NR>3 {print NR-3":"$1":"$3}' "$data_file.md")
+      index=$(echo "$nf" | awk -F':' '$3 == "y" { print $1 }')
+      col=$(echo "$nf" | awk -F':' '$3 == "y" { print $2 }')
       dv=$(zenity --entry \
         --title="Delete Record" \
         --text="Enter Value Of PK($col) for The Record You Want To Delete")
 
-        ltd=$(awk -v idx="$index" -v val="$dv" -F':' '$idx == val { print $0 }' $data_file)
+        ltd=$(awk -v idx="$index" -v val="$dv" -F';' '$idx == val { print $0 }' $data_file)
         echo "Line To Be Deleted : "$ltd
         zenity --question --text="Are you sure you want to delete this record?"
         response=$?
