@@ -249,7 +249,7 @@ function check_for_unique {
     file=$2
     shift 2
     data=$*
-    count=`cat $file |cut -d : -f $col| grep -i ^"$data"$ | wc -l`
+    count=`cat $file |cut -d ; -f $col| grep -i ^"$data"$ | wc -l`
     if [ $count -eq 0 ]
     then
         echo true
@@ -565,7 +565,7 @@ function insert_into {
     }
     if [[ $flag -eq 0 ]]
     then
-    cat $file_path/tmp.data | sed -z 's/\n/:/g;s/:$/\n/' >> $data_file
+    cat $file_path/tmp.data | sed -z 's/\n/;/g;s/;$/\n/' >> $data_file # IMPORTANT!
     fi
 }
 
