@@ -179,7 +179,7 @@ function data_type {
 shopt -s extglob
 
 input=$*
-
+str="^[a-zA-Z0-9 ]{0,255}$"
 date_time="^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1]) (2[0-3]|[0-1][0-9]):[0-5][0-9]:[0-5][0-9]$"
 
 if  [[ $input =~ ^[1-9][0-9]*$ ]]
@@ -188,7 +188,7 @@ then
 elif [[ $input =~ ^[-+]?[0-9]+\.?[0-9]*$ ]]
 then
         echo "float"
-elif [[ $input =~ ^[a-zA-Z]{0,255}$ ]]
+elif [[ $input =~ $str ]]
 then
         echo "string"
 elif [[ $input =~ ^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$ ]]
@@ -258,6 +258,8 @@ function check_for_unique {
     fi
 }
 
+#check_for_unique 1 ./Databases/seif/Employee/Employee 5
+
 function check_for_not_null {
     input=$*
     if [ -z "$input" ]
@@ -277,7 +279,7 @@ function check_for_pk {
     if [ $rtrn == true ]
     then
         rtrn=$(check_for_unique "$col" "$file" "$data")
-        if [ $rtrn == true ]
+        if [ "$rtrn" == true ]
         then
             	echo true
 	else
