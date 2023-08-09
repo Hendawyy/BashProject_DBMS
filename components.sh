@@ -490,3 +490,83 @@ function Select_Columns() {
     Menu_Table "$DB_name"
   fi
 }
+
+function insert_into {
+    table_name=`echo $*|cut -d \( -f 1`
+    file_path=./seif/$table_name 
+    if [ $(check_if_dir_exists $file_path) == false ]
+    then
+        echo "table doesn't exist"
+        return 1
+    fi
+    arguments=`echo $*|cut -d \( -f 2| cut -d \) -f 1`
+    file_path=./Databases/seif/$table_name  # modify it later to be dynamic
+    data_file=$file_path/$table_name
+    meta_data_file=$data_file.md
+    echo $arguments |sed 's/,/\n/g' > $file_path/tmp.data
+    no_of_arg=`cat $file_path/tmp.data |wc -l`
+    no_of_arg_mdfile=`cat $meta_data_file|wc -l`
+    no_of_arg_mdfile=$(($no_of_arg_mdfile-3))
+    if [ $no_of_arg -gt $no_of_arg_mdfile ]
+    then
+        echo "too many arguments"
+        return 1
+    elif [ $no_of_arg -lt $no_of_arg_mdfile ]
+    then
+        echo "all arguments must be provided"
+        return 1
+    fi
+    flag=0
+    for ((i=1; i<=$no_of_arg; i++))
+    {
+        data=`awk -v line=$i '{if (NR==line) print $0}' $file_path/tmp.data`
+        col=$(($i+3))
+        prkey=`awk -F ":" -v line=$(($i+3)) '{if(NR==line) print $3}' $meta_data_file`
+        auto_inc=`awk -F ":" -v line=$(($i+3)) '{if(NR==line) print $4}' $meta_data_file`
+        unq=`awk -F ":" -v line=$(($i+3)) '{if(NR==line) print $5}' $meta_data_file`
+        not_nul=`awk -F ":" -v line=$(($i+3)) '{if(NR==line) print $6}' $meta_data_file`
+        data_col=$i
+        if [ ! -z "$data" ]
+        then
+            if [ $(check_for_data_type $col $meta_data_file $data) == false ]
+            then
+                echo invalid input, $data
+                flag=1
+            fi
+        fi
+        if [ $unq == "y" ]
+        then
+            if [ $(check_for_unique $data_col $data_file $data) == false ]
+            then
+                echo "Unique values can't be repeated"
+                flag=1
+            fi
+        fi
+        if [ $not_nul == "y" ]
+        then
+            if [ $(check_for_not_null $data) == false ]
+            then
+                echo "This argument is required and can't be null"
+                flag=1
+            fi
+        fi
+        if [ $prkey == "y" ]
+        then
+            if [ $(check_for_pk $data_col $data_file $data) == false ]
+            then
+                echo "Value doesn't meet Primary Key constraints"
+                flag=1
+            fi
+        fi
+        if [ $auto_inc == "y" ]
+        then
+            echo "we will add that as soon as we have time"
+        fi
+    }
+    if [[ $flag -eq 0 ]]
+    then
+    cat $file_path/tmp.data | sed -z 's/\n/:/g;s/:$/\n/' >> $data_file
+    fi
+}
+
+#insert_into "Employee(5,Ahmed seif,ahmed@gmail.com,2023-12-31)"
