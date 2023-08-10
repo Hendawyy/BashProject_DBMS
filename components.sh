@@ -25,7 +25,7 @@ function check_if_name_starts_with_number {
 
 
 function check_if_dir_exists {
-	if [[ -d "Databases/$1" ]]
+	if [[ -d "$1" ]]
 	then
 		echo true
 	else
@@ -184,19 +184,19 @@ function data_type {
 
   if  [[ $input =~ ^[1-9][0-9]*$ ]]
   then
-          echo "number" 
+          echo "int" 
   elif [[ $input =~ ^[-+]?[0-9]+\.?[0-9]*$ ]]
   then
-          echo "float"
+          echo "double"
   elif [[ $input =~ $str ]]
   then
-          echo "string"
+          echo "varchar"
   elif [[ $input =~ ^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$ ]]
   then
           echo "date"
   elif [[ $input =~ $date_time ]]
   then
-          echo "date_time"
+          echo "current--date--time"
 
   elif [[ $input =~ ^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,4}$ ]]
   then
@@ -211,9 +211,10 @@ function data_type_match {
         #should path to it the expected data type
         #then the input
   expected_data_type=$1
+  lower_expected=`echo $expected_data_type | awk '{print tolower($0)}'`
   shift
   data_type=$(data_type $*)
-  if [ $expected_data_type == $data_type ]
+  if [ $lower_expected == $data_type ]
   then
           echo true
   else

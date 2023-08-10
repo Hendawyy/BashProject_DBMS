@@ -12,7 +12,7 @@ function update {
     table_name=$2
     table_path=./Databases/seif/$table_name
     rtrn=$(check_if_dir_exists $table_path) #database name then the table
-    if [ rtrn == false ]
+    if [ $rtrn == false ]
     then
         echo "invalid table name"
     else
@@ -44,12 +44,12 @@ function update {
     cond_value=$3
     where $table_path/$table_name $col_num "$operator" $cond_value > ./update.tmp
     number_of_affected_line=`cat ./update.tmp|wc -l`
-    uniqueness_check=`cat $table_path/$table_name.md|awk -F : -v col=$(($rtrn+3)) '{if(NR==col && ($3=="y"||$5=="y")) print "unique"}'`
+    uniqueness_check=`cat $table_path/$table_name.md|awk -F ":" -v col=$(($rtrn+3)) '{if(NR==col && ($3=="y"||$5=="y")) print "unique"}'`
     if [ "$uniqueness_check" == "unique" ] && [ $number_of_affected_line -gt 1 ]
     then
         echo "invalid update, Unique constraint is applied on the $col_name column, try updating one value at a time"
     else
-        cat ./update.tmp |awk -F ";" -v new_data=$new_data -v col=$rtrn 'BEGIN { OFS = ";"; ORS = "\n" }{
+        cat ./update.tmp |awk -F ";" -v new_data="$new_data" -v col=$rtrn 'BEGIN { OFS = ";"; ORS = "\n" }{
             $col=new_data
             print $0
         }' > ./awk.tmp
@@ -64,10 +64,13 @@ function update {
     data3=${modified_Arr[j]}
     if [ "$data1" == "$data2" ]
     then
-        sed -i "s/$data1/$data3/" $table_path/$table_name
+        echo $data3 >> tmp.txt
         j+=1
+    else
+        echo $data1 >> tmp.txt
     fi 
     done
+    cat tmp.txt > $table_path/$table_name
     echo "UPDATED"
     fi
     fi
@@ -82,5 +85,8 @@ function update {
     if [ -f ./awk.tmp ]
     then rm ./awk.tmp
     fi
+    if [ -f ./tmp.txt ]
+    then rm ./tmp.txt
+    fi
 }
-update update Employee set bd = 2023-06-31 where id ">" 5
+update update Employee set email = JR_seif_hendawy@gmail.com where id "=" 7
