@@ -174,37 +174,75 @@ function append_attribute {
 }
 
 
+function validate_password_strength {
+    password=$1
+
+    if [[ ! $password =~ [A-Z] ]]; then
+        zenity --error --text "Password must have at least one uppercase letter"
+        Menu_Table "$DB_name"
+    fi
+
+    if [[ ! $password =~ [a-z] ]]; then
+        zenity --error --text "Password must have at least one lowercase letter"
+        Menu_Table "$DB_name"
+    fi
+
+    if [[ ! $password =~ [0-9] ]]; then
+        zenity --error --text "Password must have at least one digit"
+        Menu_Table "$DB_name"
+    fi
+
+    # if [[ ! $password =~ [!@#\$%\^&\*\(\)_\+\-=\{\}\[\]:;<>,.?~] ]]; then
+    #     zenity --error --text "Password must have at least one special character"
+    #     Menu_Table "$DB_name"
+    # fi
+}
+
 function data_type {
 
   shopt -s extglob
 
   input=$*
   str="^[a-zA-Z0-9 ]{0,255}$"
-  date_time="^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1]) (2[0-3]|[0-1][0-9]):[0-5][0-9]:[0-5][0-9]$"
+  date_pattern="^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$"
+  date_time_pattern="^[0-9]{4}-((0[1-9])|(1[0-2]))-((0[1-9])|([1-2][0-9])|(3[0-1]))---((2[0-3])|([0-1][0-9])):[0-5][0-9]:[0-5][0-9]$"
+  email_pattern="^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,4}$"
+  enum_pattern="^(([0-9]+)|([a-zA-Z0-9 ]+))(,(([0-9]+)|([a-zA-Z0-9 ]+)))*$"
+  phone_pattern="^01[0-9]{9}$"
+  password_pattern="^[a-zA-Z0-9!@#$%^&*()_+]{8,}$"
 
   if  [[ $input =~ ^[1-9][0-9]*$ ]]
   then
-          echo "number" 
+    echo "INT"
   elif [[ $input =~ ^[-+]?[0-9]+\.?[0-9]*$ ]]
   then
-          echo "float"
+    echo "Double"
   elif [[ $input =~ $str ]]
   then
-          echo "string"
-  elif [[ $input =~ ^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$ ]]
+    echo "Varchar"
+  elif [[ $input =~ $date_pattern ]]
   then
-          echo "date"
-  elif [[ $input =~ $date_time ]]
+    echo "Date"
+  elif [[ $input =~ $date_time_pattern ]]
   then
-          echo "date_time"
+    echo "Current--Date--Time"
+  elif [[ $input =~ $email_pattern ]]
+  then
+    echo "Email"
+  elif [[ $input =~ $enum_pattern ]]
+  then
+    echo "Enum"
+  elif [[ $input =~ $phone_pattern ]]
+  then
+    echo "Phone"
+  elif [[ $input =~ $password_pattern ]]; then
 
-  elif [[ $input =~ ^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,4}$ ]]
-  then
-          echo "email"
+    echo "Password"
   else
-          echo "text"
+    echo "text"
   fi
 }
+
 
 
 function data_type_match {
