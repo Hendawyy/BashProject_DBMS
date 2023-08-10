@@ -927,3 +927,44 @@ function insert_into {
 }
 
 #insert_into "Employee(5,Ahmed seif,ahmed@gmail.com,2023-12-31)"
+
+
+function check_if_col_exists {
+    meta_data_file=$1
+    col_name=$2
+    col_num=`cat $meta_data_file|cut -d : -f 1 |grep -n ^$col_name$` #returns number:name
+    if [ -z $col_num ]
+    then
+        echo "false"
+    else
+    num=`echo $col_num| cut -d : -f 1`
+    num=$((num-3))
+    echo $num
+    fi
+}
+#check_if_col_exists ./Databases/seif/Employee/Employee.md email
+
+function where {
+    # where table_path column == 12345
+    data_file_path=$1
+    col=$2
+    cond=$3
+    shift 3
+    value=$*
+    cat $data_file_path|awk -F ";" -v col=$col -v cond=${cond} -v value="$value" '{
+    IGNORECASE=1
+    if($col == value && (cond == "==" || cond == "="))
+    {print $0;}
+    else if($col >= value && cond == ">=")
+    {print $0}
+    else if($col <= value && cond == "<=")
+    {print $0}
+    else if($col != value && cond == "!=")
+    {print $0}
+    else if($col > value && cond == ">")
+    {print $0}
+    else if($col < value && cond == "<")
+    {print $0}
+    }' 
+}
+#where "./Databases/seif/Employee/Employee" 4 "<=" 2022-10-31
