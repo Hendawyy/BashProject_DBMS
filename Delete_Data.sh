@@ -17,9 +17,6 @@ function Delete_Data() {
     nf=$(awk -F':' 'NR>3 {print NR-3":"$1":"$3}' "$data_file.md")
     index=$(echo "$nf" | awk -F':' '$3 == "y" { print $1 }')
     col=$(echo "$nf" | awk -F':' '$3 == "y" { print $2 }')
-    echo n:$nf
-    echo i:$index
-    echo c:$col
     dv=$(zenity --entry \
       --title="Delete Record" \
       --text="Enter Value Of PK($col) for The Record You Want To Delete")
