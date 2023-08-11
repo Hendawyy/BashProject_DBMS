@@ -4,7 +4,7 @@
 
 function check_special_char {
   x=$1
-  if [[ $x =~ [\'\"\^\\[\#\`\~\$\%\=\+\<\>\|\:\ \(\)\@\;\?\&\*\\\/]+ ]]
+  if [[ $x =~ [\!\'\"\^\\[\#\`\~\$\%\=\+\<\>\|\:\ \(\)\@\;\?\&\*\\\/]+ ]]
   then
     echo true
   else
@@ -164,6 +164,39 @@ function arguments_checker {
 }
 
 
+function Tb_txf {
+
+  arg_name=$(echo $* | awk '{print tolower($0)}')
+
+  # Check for naming constraints
+  rtrn=$(check_special_char $arg_name)
+  if [ "$rtrn" == true ]; then
+     zenity --error --text="Name can't contain special characters"
+    return 1
+  else
+    rtrn=$(check_if_name_starts_with_number $arg_name)
+    if [ "$rtrn" == true ]; then
+       zenity --error --text="Name can't start with numbers"
+      return 1
+    else
+      rtrn=$(check_for_empty_string $arg_name)
+      if [ "$rtrn" == true ]; then
+         zenity --error --text="Column name must be provided"
+        return 1
+      else
+        rtrn=$(check_if_dir_exists $arg_name)
+        if [ "$rtrn" == true ]; then
+          echo  zenity --error --text="Table name already exists in your DB"
+          return 1
+        else
+          echo true  # All checks passed successfully
+        fi
+      fi
+    fi
+  fi
+}
+
+
 function append_attribute {
   filtered_line=`echo $* | cut -d \( -f 2 |cut -d \) -f 1`
   echo $filtered_line | sed 's/,/\n/g' > temp.md
@@ -177,25 +210,11 @@ function append_attribute {
 function validate_password_strength {
     password=$1
 
-    if [[ ! $password =~ [A-Z] ]]; then
-        zenity --error --text "Password must have at least one uppercase letter"
-        Menu_Table "$DB_name"
+    if [[ ${#password} -ge 8 && "$password" == *[A-Z]* && "$password" == *[a-z]* && "$password" == *[0-9]* ]]; then
+        echo true
+    else
+        echo false
     fi
-
-    if [[ ! $password =~ [a-z] ]]; then
-        zenity --error --text "Password must have at least one lowercase letter"
-        Menu_Table "$DB_name"
-    fi
-
-    if [[ ! $password =~ [0-9] ]]; then
-        zenity --error --text "Password must have at least one digit"
-        Menu_Table "$DB_name"
-    fi
-
-    # if [[ ! $password =~ [!@#\$%\^&\*\(\)_\+\-=\{\}\[\]:;<>,.?~] ]]; then
-    #     zenity --error --text "Password must have at least one special character"
-    #     Menu_Table "$DB_name"
-    # fi
 }
 
 function data_type {
@@ -209,54 +228,93 @@ function data_type {
   email_pattern="^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,4}$"
   enum_pattern="^(([0-9]+)|([a-zA-Z0-9 ]+))(,(([0-9]+)|([a-zA-Z0-9 ]+)))*$"
   phone_pattern="^01[0-9]{9}$"
-  password_pattern="^[a-zA-Z0-9!@#$%^&*()_+]{8,}$"
-
+ 
   if  [[ $input =~ ^[1-9][0-9]*$ ]]
   then
-    echo "INT"
+    echo "int"
   elif [[ $input =~ ^[-+]?[0-9]+\.?[0-9]*$ ]]
   then
-    echo "Double"
+    echo "double"
   elif [[ $input =~ $str ]]
   then
-    echo "Varchar"
+    echo "varchar"
   elif [[ $input =~ $date_pattern ]]
   then
-    echo "Date"
+    echo "date"
   elif [[ $input =~ $date_time_pattern ]]
   then
-    echo "Current--Date--Time"
+    echo "current--date--time"
   elif [[ $input =~ $email_pattern ]]
   then
-    echo "Email"
+    echo "email"
   elif [[ $input =~ $enum_pattern ]]
   then
-    echo "Enum"
+    echo "enum"
   elif [[ $input =~ $phone_pattern ]]
   then
-    echo "Phone"
-  elif [[ $input =~ $password_pattern ]]; then
-
-    echo "Password"
+    echo "phone"
   else
     echo "text"
   fi
 }
+
+function isNumber {
+  if [[ $* =~ ^[1-9][0-9]*$ ]]; then
+    echo "true"
+  else
+    echo "false"
+  fi
+}
+
+function check_repeated_columns {
+  local columns=("$@")
+
+  declare -A column_counts
+
+  for column in "${columns[@]}"; do
+    ((column_counts["$column"]++))
+  done
+
+  for column in "${!column_counts[@]}"; do
+    if [ "${column_counts[$column]}" -gt 1 ]; then
+      zenity --error --text="You Can't Have 2 Columns with the Same Name"
+      return 1
+    fi
+  done
+
+  return 0
+}
+
+
+
 
 
 function data_type_match {
         #should path to it the expected data type
         #then the input
   expected_data_type=$1
+  if [ "$expected_data_type" == "ID--Int--Auto--Inc." ]; 
+  then
+  expected_data_type="INT"
+  fi
   lower_expected=`echo $expected_data_type | awk '{print tolower($0)}'`
   shift
-  data_type=$(data_type $*)
-  if [ $lower_expected == $data_type ]
-  then
-          echo true
-  else
-          echo false
-  fi
+  if [ "$lower_expected" == "password" ]; then
+    vp=$(validate_password_strength "$1")
+    if [ "$vp" == true ]; then
+        echo true
+    else
+        echo false
+    fi
+else
+    data_type=$(data_type "$*")
+    if [ "$lower_expected" == "$data_type" ]; then
+        echo true
+    else
+        echo false
+    fi
+fi
+
 }
 
 #data_type_match "date" "2023-13-15"

@@ -44,6 +44,7 @@ function update {
     cond_value=$3
     where $table_path/$table_name $col_num "$operator" $cond_value > ./update.tmp
     number_of_affected_line=`cat ./update.tmp|wc -l`
+    echo $number_of_affected_line
     uniqueness_check=`cat $table_path/$table_name.md|awk -F ":" -v col=$(($rtrn+3)) '{if(NR==col && ($3=="y"||$5=="y")) print "unique"}'`
     if [ "$uniqueness_check" == "unique" ] && [ $number_of_affected_line -gt 1 ]
     then
@@ -89,4 +90,4 @@ function update {
     then rm ./tmp.txt
     fi
 }
-update update Employee set email = JR_seif_hendawy@gmail.com where id "=" 7
+update update Trial set Name = Mostafa where ID "=" 9

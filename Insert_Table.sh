@@ -15,17 +15,17 @@ function Insert_Table() {
   fi
 
   table_name=$selected_tb
-  column_data=()
 
   column_names=($(awk -F ':' 'NR > 3 {print $1}' "../$DB_name/$table_name/$table_name.md"))
   data_types=($(awk -F ':' 'NR > 3 {print $2}' "../$DB_name/$table_name/$table_name.md"))
 
+  column_data=()
   for i in "${!column_names[@]}"; do
     column_name="${column_names[i]}"
     data_type="${data_types[i]}"
     echo $column_name: $data_type
     if [[ "$data_type" == "ID--Int--Auto--Inc." ]]; then
-      last_value=$(tail -n 1 "../$DB_name/$table_name/$table_name" | cut -d ':' -f 1)
+      last_value=$(tail -n 1 "../$DB_name/$table_name/$table_name" | cut -d ';' -f 1)
       if [[ -z "$last_value" ]]; then
         column_data+=("1")
       else
@@ -34,19 +34,49 @@ function Insert_Table() {
       fi
     elif [[ "$data_type" == "INT" ]]; then
     column_value=$(zenity --entry --title="Enter Value" --text="Enter value for $column_name (INT):")
-    column_data+=("$column_value")
+    rtrn=$(data_type_match $data_type $column_value)
+    if [ $rtrn == true ]; then
+      column_data+=("$column_value")
+    else
+      zenity --error --text="Data Type Mismatch The Expected Value Must Be : $data_type"
+      Insert_Table
+    fi
     elif [[ "$data_type" == "Double" ]]; then
     column_value=$(zenity --entry --title="Enter Value" --text="Enter value for $column_name (Double):")
-    column_data+=("$column_value")
+    rtrn=$(data_type_match $data_type $column_value)
+    if [ $rtrn == true ]; then
+      column_data+=("$column_value")
+    else
+      zenity --error --text="Data Type Mismatch The Expected Value Must Be : $data_type"
+      Insert_Table
+    fi
     elif [[ "$data_type" == "Varchar" ]]; then
     column_value=$(zenity --entry --title="Enter Value" --text="Enter value for $column_name (Varchar):")
-    column_data+=("$column_value")
+    rtrn=$(data_type_match $data_type $column_value)
+    if [ $rtrn == true ]; then
+      column_data+=("$column_value")
+    else
+      zenity --error --text="Data Type Mismatch The Expected Value Must Be : $data_type"
+      Insert_Table
+    fi
     elif [[ "$data_type" == "Phone" ]]; then
     column_value=$(zenity --entry --title="Enter Value" --text="Enter value for $column_name (Phone):")
-    column_data+=("$column_value")
+    rtrn=$(data_type_match $data_type $column_value)
+    if [ $rtrn == true ]; then
+      column_data+=("$column_value")
+    else
+      zenity --error --text="Data Type Mismatch The Expected Value Must Be : $data_type"
+      Insert_Table
+    fi
     elif [[ "$data_type" == "Email" ]]; then
     column_value=$(zenity --entry --title="Enter Value" --text="Enter value for $column_name (Email):")
-    column_data+=("$column_value")
+    rtrn=$(data_type_match $data_type $column_value)
+    if [ $rtrn == true ]; then
+      column_data+=("$column_value")
+    else
+      zenity --error --text="Data Type Mismatch The Expected Value Must Be : $data_type"
+      Insert_Table
+    fi
     elif [[ "$data_type" == "Enum" ]]; then
      enum_values=$(awk -F ':' 'NR > 3 {print $6}' "../$DB_name/$table_name/$table_name.md"| tr '{}' ' ')
 
@@ -61,7 +91,13 @@ function Insert_Table() {
      fi
     elif [[ "$data_type" == "Password" ]]; then
       column_value=$(zenity --password --title="Enter Value" --text="Enter password for $column_name:")
-      column_data+=("$column_value")
+      rtrn=$(validate_password_strength "$column_value")
+    if [ $rtrn == false ]; then
+          zenity --error --text="Password must have at least 8 characters ,has at least one digit,has at least one Upper case Alphabet,has at least one Lower case Alphabet"
+          Insert_Table
+    else
+          column_data+=("$column_value")
+    fi
     elif [[ "$data_type" == "Date" ]]; then
       column_value=$(zenity --calendar --title="Select Date" --text="Select date for $column_name:")
       column_data+=("$column_value")

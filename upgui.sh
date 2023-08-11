@@ -13,9 +13,10 @@ function update {
         --text="Choose a Table:" \
         --column="Tables" $Tables_list)
 
+    table_name="$selected_tb"
+    data_file="../../$DB_name/$table_name/$table_name"
     if [ $? -eq 1 ]; then
-        echo "Table selection cancelled."
-        exit 0
+        Menu_Table "$DB_name"
     fi
 
     keyword1='update' 
@@ -31,8 +32,7 @@ function update {
         --column="Column" $column_names)
     
     if [ $? -eq 1 ]; then
-        echo "Column selection cancelled."
-        exit 0
+         Menu_Table "$DB_name"
     fi
     
     column_name=$selected_col
@@ -59,10 +59,11 @@ function update {
             --column="Value" ${enum_values})
     elif [[ "$DT" == "Password" ]]; then
         New_val=$(zenity --password --title="Enter New Value" --text="Enter password for $column_name:")
+        validate_password_strength "$New_val"
     elif [[ "$DT" == "Date" ]]; then
         New_val=$(zenity --calendar --title="Select Date" --text="Select date for $column_name:")
     elif [[ "$DT" == "Current--Date--Time" ]]; then
-        current_datetime=$(date +"%Y-%m-%d---%H:%M:%S")
+        New_val=$(date +"%Y-%m-%d---%H:%M:%S")
     fi
 
     new_data=$New_val
@@ -73,8 +74,7 @@ function update {
         --column="Column" $column_names)
     
     if [ $? -eq 1 ]; then
-        echo "Column selection cancelled."
-        exit 0
+        Menu_Table "$DB_name"
     fi
     
     DTcond=$(awk -F: 'NR>3 && $1 == selected_col {print $2}' selected_col="$selected_colcond" "$table_path/$table_name.md")
@@ -106,16 +106,19 @@ function update {
       Menu_Table "$DB_name"
     fi
     
-    cond_value=$value
+    col_cond=$(awk -F: 'NR>3 && $1 == selected_col {print NR-3}' selected_col="$selected_colcond" "$table_path/$table_name.md")
 
-    where $table_path/$table_name $col_num "$operator" $cond_value > ./update.tmp
+    cond_value=$value
+    colxn=$(check_if_col_exists $table_path/$table_name.md $column_name) 
+
+    where $table_path/$table_name $col_cond "$operator" $cond_value > ./update.tmp
     number_of_affected_line=$(cat ./update.tmp | wc -l)
-    uniqueness_check=$(cat $table_path/$table_name.md | awk -F : -v col=$(($rtrn + 3)) '{if(NR==col && ($3=="y"||$5=="y")) print "unique"}')
+    uniqueness_check=$(cat $table_path/$table_name.md | awk -F : -v col=$(($colxn + 3)) '{if(NR==col && ($3=="y"||$5=="y")) print "unique"}')
 
     if [ "$uniqueness_check" == "unique" ] && [ $number_of_affected_line -gt 1 ]; then
-        echo "invalid update, Unique constraint is applied on the $col_name column, try updating one value at a time"
+                     echo "Unique constraint is applied on the $col_name column, try updating one value at a time"
     else
-        cat ./update.tmp | awk -F ";" -v new_data=$new_data -v col=$rtrn 'BEGIN { OFS = ";"; ORS = "\n" }{
+        cat ./update.tmp | awk -F ";" -v new_data=$new_data -v col=$colxn 'BEGIN { OFS = ";"; ORS = "\n" }{
             $col=new_data
             print $0
         }' > ./awk.tmp
@@ -130,26 +133,25 @@ function update {
             data3=${modified_Arr[j]}
             
             if [ "$data1" == "$data2" ]; then
-                sed -i "s/$data1/$data3/" $table_path/$table_name
-                if [ $? -eq 0 ]; then
-                    zenity --info \
-                     --text="Table($table_name) Updated Successfully."
-                else
-                    zenity --info \
-                     --text="Table($table_name) Failed To Update."
-                fi
-
+                echo $data3 >> tmp.txt
                 j+=1
-            fi 
+            else
+                echo $data1 >> tmp.txt
+            fi
         done
+        cat tmp.txt > $table_path/$table_name
     fi
 
-    if [ -f ./update.tmp ]; then
-        rm ./update.tmp
+    if [ -f ./update.tmp ]
+        then rm ./update.tmp
     fi
 
-    if [ -f ./awk.tmp ]; then
-        rm ./awk.tmp
+    if [ -f ./awk.tmp ]
+        then rm ./awk.tmp
+    fi
+    
+    if [ -f ./tmp.txt ]
+        then rm ./tmp.txt
     fi
 }
 update
