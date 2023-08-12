@@ -3,7 +3,7 @@
 
 function DBmenu(){
     while true; do
-    choice=$(zenity --list \
+    choice=$(zenity --list --width=300 --height=250 \
     --title="Bashmohandes Mina's DBMS Main Menu" \
     --text="Please Choose An Option:" \
     --column="What Do You Wish To Do" \

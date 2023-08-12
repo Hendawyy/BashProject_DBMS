@@ -2,7 +2,7 @@
 
 function Menu_Table() {
     while
-        selected_table=$(zenity --list \
+        selected_table=$(zenity  --list --width=300 --height=300 \
             --title="Table Menu" \
             --text="Choose an operation for the Database '$1':" \
             --column="Options" \
@@ -45,7 +45,7 @@ function Menu_Table() {
                     echo "Current directory: $(pwd)"
                     DBmenu
                 else
-                    zenity --error --text="Invalid choice. Please try again."
+                    zenity --error --width=400 --height=100 --text="Invalid choice. Please try again."
                 fi
                 ;;
             esac

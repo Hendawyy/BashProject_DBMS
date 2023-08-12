@@ -4,7 +4,7 @@ source components.sh
 
 function create_data_base {
 while true; do
-    db_name=$(zenity --entry \
+    db_name=$(zenity --entry --width=400 --height=100 \
       --title="Create Database" \
       --text="Enter The DB Name:")
     
@@ -29,13 +29,13 @@ while true; do
                     zenity --error --text="invalid name, avoid using special characters like: ws, &, *, @"
                 else
                     mkdir -p "Databases/$db_namez"
-                    zenity --info --text="Database $db_namez.db created successfully!"
+                    zenity --info --width=400 --height=100  --text="Database $db_namez.db created successfully!"
                     break  
                 fi
             fi
         fi
     else
-        zenity --error --text="DB Name can't be Empty"
+        zenity --error --width=400 --height=100  --text="DB Name can't be Empty"
     fi
 done
 }

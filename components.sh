@@ -38,7 +38,7 @@ function check_if_dir_exists {
 function list_databases() {
   local database_list=$(ls  Databases/ | awk '{print $0 ".db"}')
 
-  selected_db=$(zenity --list \
+  selected_db=$(zenity --list --width=300 --height=250 \
     --title="List of Databases" \
     --text="Choose a DB to connect to:" \
     --column="Databases" $database_list)
@@ -47,12 +47,12 @@ function list_databases() {
     DBmenu
   fi
 
-  zenity --question --text="Do you want to connect to '$selected_db'?"
+  zenity --question --width=400 --height=100  --text="Do you want to connect to '$selected_db'?" 
   response=$?
   if [ $response -eq 0 ]; then
     connect_to_database "$selected_db"
   else
-    zenity --info \
+    zenity --info --width=400 --height=100 \
   --text="You chose not to connect to any database."
     DBmenu
   fi
@@ -62,7 +62,7 @@ function connect_to_database() {
   local db_name=$(echo "$1" | sed 's/\.db$//')
 
   cd "Databases/$db_name"
-  zenity --info \
+  zenity --info --width=400 --height=100 \
   --text="Connected to the database: $db_name"
   echo "Current directory: $(pwd)"
   source ../../Table_menu.sh
@@ -171,22 +171,22 @@ function Tb_txf {
   # Check for naming constraints
   rtrn=$(check_special_char $arg_name)
   if [ "$rtrn" == true ]; then
-     zenity --error --text="Name can't contain special characters"
+     zenity --error --width=400 --height=100  --text="Name can't contain special characters"
     return 1
   else
     rtrn=$(check_if_name_starts_with_number $arg_name)
     if [ "$rtrn" == true ]; then
-       zenity --error --text="Name can't start with numbers"
+       zenity --error --width=400 --height=100  --text="Name can't start with numbers"
       return 1
     else
       rtrn=$(check_for_empty_string $arg_name)
       if [ "$rtrn" == true ]; then
-         zenity --error --text="Column name must be provided"
+         zenity --error --width=400 --height=100  --text="Column name must be provided"
         return 1
       else
         rtrn=$(check_if_dir_exists $arg_name)
         if [ "$rtrn" == true ]; then
-          echo  zenity --error --text="Table name already exists in your DB"
+          echo  zenity --error --width=400 --height=100  --text="Table name already exists in your DB"
           return 1
         else
           echo true  # All checks passed successfully
@@ -277,7 +277,7 @@ function check_repeated_columns {
 
   for column in "${!column_counts[@]}"; do
     if [ "${column_counts[$column]}" -gt 1 ]; then
-      zenity --error --text="You Can't Have 2 Columns with the Same Name"
+      zenity --error --width=400 --height=100  --text="You Can't Have 2 Columns with the Same Name"
       return 1
     fi
   done
@@ -306,14 +306,14 @@ function data_type_match {
     else
         echo false
     fi
-else
+  else
     data_type=$(data_type "$*")
     if [ "$lower_expected" == "$data_type" ]; then
         echo true
     else
         echo false
     fi
-fi
+  fi
 
 }
 
@@ -328,7 +328,7 @@ function list_tables() {
 
   local Tables_list=$(ls "$current_dir/")
 
-  selected_tb=$(zenity --list \
+  selected_tb=$(zenity --list --width=300 --height=250 \
     --title="List of Tables in $DB_name.db" \
     --text="Choose a Table:" \
     --column="Tables" $Tables_list)
@@ -405,7 +405,7 @@ function check_for_data_type {
 
 
 function Select_All() {
-  selected_tb=$(zenity --list \
+  selected_tb=$(zenity --list --width=300 --height=250  \
     --title="List of Tables in $DB_name.db" \
     --text="Choose a Table:" \
     --column="Tables" $Tables_list)
@@ -489,7 +489,7 @@ function Select_All() {
 
 
 function Select_Columns() {
-  selected_tb=$(zenity --list \
+  selected_tb=$(zenity --list --width=300 --height=250  \
       --title="List of Tables in $DB_name.db" \
       --text="Choose a Table:" \
       --column="Tables" $Tables_list)
@@ -509,7 +509,7 @@ function Select_Columns() {
     checklist_options+=(FALSE "$header")
   done
 
-  selected_headers=$(zenity --list \
+  selected_headers=$(zenity --list --width=300 --height=250  \
     --title="Columns" \
     --text="Choose the Columns you want to select :" \
     --checklist \
@@ -564,7 +564,6 @@ function Select_Columns() {
 
       for field_index in "${field_indices[@]}"; do
         field_data=${fields[field_index-1]}
-        echo $field_index":"$field_data
         selected_headers_table+="<td>$field_data</td>"
       done
 
@@ -596,7 +595,7 @@ function Select_With_Condition() {
   local type=$1
 
   if [ "$type" == "All(*)" ]; then
-    selected_tb=$(zenity --list \
+    selected_tb=$(zenity --list --width=300 --height=250  \
         --title="List of Tables in $DB_name.db" \
         --text="Choose a Table:" \
         --column="Tables" $Tables_list)
@@ -611,7 +610,7 @@ function Select_With_Condition() {
     pk=$(awk -F':' '$3 == "y" { print $1 }' "$data_file.md")
     colsz=$(awk -F: 'NR>3 {print $1}' "$data_file.md")
 
-    selected_col=$(zenity --list \
+    selected_col=$(zenity --list --width=300 --height=250  \
       --title="List of Columns" \
       --text="Choose a Column You want to condition:" \
       --column="Columns" $colsz)
@@ -629,7 +628,7 @@ function Select_With_Condition() {
     fi
 
 
-    selected_op=$(zenity --list \
+    selected_op=$(zenity --list --width=300 --height=250  \
       --title="List of Operators" \
       --text="Choose The Operator You Want To Use In The Condition:" \
       --column="Operators" "${operatots[@]}")
@@ -640,111 +639,120 @@ function Select_With_Condition() {
 
     arg=$(awk -F: -v selected_col="$selected_col" '$1==selected_col {print NR-3}' "$data_file.md")
 
-    value=$(zenity --entry --title="Enter Value" \
+
+    value=$(zenity --entry --width=400 --height=100  --title="Enter Value" \
       --text="Enter value for $selected_col ($DT):")
 
     if [ $? -eq 1 ]; then
       Menu_Table "$DB_name"
     fi
 
-    formatted_data="<html>
-    <head>
-    <style>
-      body {
-        font-family: Arial, sans-serif;
-      }
-      table {
-        border-collapse: collapse;
-        width: 100%;
-      }
-      th, td {
-        border: 1px solid #dddddd;
-        text-align: left;
-        padding: 8px;
-      }
-      th {
-        background-color: #f2f2f2;
-      }
-      .icons {
-        font-size: 20px;
-        cursor: pointer;
-      }
-    </style>
-    </head>
-    <center>
-    <body>
-    <center>
-      <h2>$table_name Table</h2>
-      <h5 style='color:crimson'><b>$pk</b> is the <b>PK</b> for this Table</h5>
-    </center>
-    <table>
-      <tr>"
+    rtrn=$(data_type_match "$DT" "$value")
+    if [ "$rtrn" == true ]; then
+      formatted_data="<html>
+      <head>
+      <style>
+        body {
+          font-family: Arial, sans-serif;
+        }
+        table {
+          border-collapse: collapse;
+          width: 100%;
+        }
+        th, td {
+          border: 1px solid #dddddd;
+          text-align: left;
+          padding: 8px;
+        }
+        th {
+          background-color: #f2f2f2;
+        }
+        .icons {
+          font-size: 20px;
+          cursor: pointer;
+        }
+      </style>
+      </head>
+      <center>
+      <body>
+      <center>
+        <h2>$table_name Table</h2>
+        <h5 style='color:crimson'><b>$pk</b> is the <b>PK</b> for this Table</h5>
+      </center>
+      <table>
+        <tr>"
 
-    headers=$(awk -F: 'NR>3 {print $1}' "$data_file.md")
-    num_fields=$(awk -F: 'NR>3 {print NR-3}' "$data_file.md" | wc -l)
+      headers=$(awk -F: 'NR>3 {print $1}' "$data_file.md")
+      num_fields=$(awk -F: 'NR>3 {print NR-3}' "$data_file.md" | wc -l)
 
-    for header in $headers; do
-      formatted_data+="<th>$header</th>"
-    done
+      for header in $headers; do
+        formatted_data+="<th>$header</th>"
+      done
 
-    formatted_data+="<th>Actions</th>"
-    formatted_data+="</tr>"
+      formatted_data+="<th>Actions</th>"
+      formatted_data+="</tr>"
 
-    if [ "$DT" == "ID--Int--Auto--Inc." ] || [ "$DT" == "INT" ] || [ "$DT" == "Double" ]; then
-      if [ "$selected_op" == "==" ]; then
-        operator="-eq"
-      elif [ "$selected_op" == "!=" ]; then
-        operator="-ne"
-      elif [ "$selected_op" == ">" ]; then
-        operator="-gt"
-      elif [ "$selected_op" == "<" ]; then
-        operator="-lt"
-      elif [ "$selected_op" == ">=" ]; then
-        operator="-ge"
-      elif [ "$selected_op" == "<=" ]; then
-        operator="-le"
+      if [ "$DT" == "ID--Int--Auto--Inc." ] || [ "$DT" == "INT" ] || [ "$DT" == "Double" ]; then
+        if [ "$selected_op" == "==" ]; then
+          operator="-eq"
+        elif [ "$selected_op" == "!=" ]; then
+          operator="-ne"
+        elif [ "$selected_op" == ">" ]; then
+          operator="-gt"
+        elif [ "$selected_op" == "<" ]; then
+          operator="-lt"
+        elif [ "$selected_op" == ">=" ]; then
+          operator="-ge"
+        elif [ "$selected_op" == "<=" ]; then
+          operator="-le"
+        fi
+        while IFS= read -r line; do
+          IFS=";" read -ra fields <<< "$line"
+          if [ ${fields[$arg-1]} $operator "$value" ]; then
+            formatted_data+="<tr>"
+            for ((i = 0; i < num_fields; i++)); do
+              formatted_data+="<td>${fields[i]}</td>"
+            done
+            formatted_data+="<td>&#9997; &#128465;</td>"
+            formatted_data+="</tr>"
+          fi
+        done < "$data_file"
+      else
+        while IFS= read -r line; do
+          IFS=";" read -ra fields <<< "$line"
+          if [ "${fields[$arg-1]}" $selected_op "$value" ]; then
+            formatted_data+="<tr>"
+            for ((i = 0; i < num_fields; i++)); do
+              formatted_data+="<td>${fields[i]}</td>"
+            done
+            formatted_data+="<td>&#9997; &#128465;</td>"
+            formatted_data+="</tr>"
+          fi
+        done < "$data_file"
       fi
-      while IFS= read -r line; do
-        IFS=";" read -ra fields <<< "$line"
-        if [ ${fields[$arg-1]} $operator "$value" ]; then
-          formatted_data+="<tr>"
-          for ((i = 0; i < num_fields; i++)); do
-            formatted_data+="<td>${fields[i]}</td>"
-          done
-          formatted_data+="<td>&#9997; &#128465;</td>"
-          formatted_data+="</tr>"
-        fi
-      done < "$data_file"
+
+
+
+      formatted_data+="</table>
+      </body>
+      </center>
+      </html>"
+
+      zenity --text-info --title="$table_name Table" --width=1080 --height=950 \
+        --html --filename=<(echo "$formatted_data") 2>>/dev/null
+
+      if [ $? -eq 1 ]; then
+        Menu_Table "$DB_name"
+      fi
     else
-      while IFS= read -r line; do
-        IFS=";" read -ra fields <<< "$line"
-        if [ "${fields[$arg-1]}" $selected_op "$value" ]; then
-          formatted_data+="<tr>"
-          for ((i = 0; i < num_fields; i++)); do
-            formatted_data+="<td>${fields[i]}</td>"
-          done
-          formatted_data+="<td>&#9997; &#128465;</td>"
-          formatted_data+="</tr>"
-        fi
-      done < "$data_file"
+        zenity --error --width=400 --height=100  --text="Data Type Mismatch The Expected Value Must Be : $DT"
+        Select_Tb
     fi
-
-
-
-    formatted_data+="</table>
-    </body>
-    </center>
-    </html>"
-
-    zenity --text-info --title="$table_name Table" --width=1080 --height=950 \
-      --html --filename=<(echo "$formatted_data") 2>>/dev/null
-
-    if [ $? -eq 1 ]; then
-      Menu_Table "$DB_name"
-    fi
+    
+    
 
   elif [ "$type" == "Columns" ]; then
-   selected_tb=$(zenity --list \
+   selected_tb=$(zenity --list --width=300 --height=250  \
     --title="List of Tables in $DB_name.db" \
     --text="Choose a Table:" \
     --column="Tables" $Tables_list)
@@ -764,7 +772,7 @@ function Select_With_Condition() {
       checklist_options+=(FALSE "$header")
     done
 
-    selected_headers=$(zenity --list \
+    selected_headers=$(zenity --list --width=300 --height=250  \
       --title="Columns" \
       --text="Choose the Columns you want to select :" \
       --checklist \
@@ -781,7 +789,7 @@ function Select_With_Condition() {
           valuess+=("$colzam")
       done
 
-    selected_col=$(zenity --list \
+    selected_col=$(zenity --list --width=300 --height=250  \
       --title="List of Columns" \
       --text="Choose a Column You want to condition:" \
       --column="Columns" "${valuess[@]}")
@@ -790,7 +798,6 @@ function Select_With_Condition() {
 
       for xxx in "${valuess[@]}"; do
           index=$(awk -F ':' -v col="$xxx" '($1 == col) { print NR - 3; }' "$data_file.md")
-          echo $index:$xxx
           if [ -n "$index" ]; then
               hds+=("$index")
           fi
@@ -808,7 +815,7 @@ function Select_With_Condition() {
     fi
     
 
-      selected_op=$(zenity --list \
+      selected_op=$(zenity --list --width=300 --height=250  \
         --title="List of Operators" \
         --text="Choose The Operator You Want To Use In The Condition:" \
         --column="Operators" "${operatots[@]}")
@@ -818,115 +825,121 @@ function Select_With_Condition() {
       fi
     
     arg=$(awk -F: -v selected_col="$selected_col" '$1==selected_col {print NR-3}' "$data_file.md")
-    value=$(zenity --entry --title="Enter Value" \
+    value=$(zenity --entry --width=400 --height=100  --title="Enter Value" \
       --text="Enter value for $selected_col ($DT):")
 
     if [ $? -eq 1 ]; then
       Menu_Table "$DB_name"
     fi
 
-
+    rtrn=$(data_type_match "$DT" "$value")
     if [ $? -eq 0 ]; then
-      IFS='|' read -ra selected_headers_array <<< "$selected_headers"
-      selected_headers_table="<html>
-      <head>
-      <style>
-        body {
-          font-family: Arial, sans-serif;
-        }
-        table {
-          border-collapse: collapse;
-          width: 100%;
-        }
-        th, td {
-          border: 1px solid #dddddd;
-          text-align: left;
-          padding: 8px;
-        }
-        th {
-          background-color: #f2f2f2;
-        }
-      </style>
-      </head>
-      <center>
-      <body>
-      <center>
-        <h2>$table_name Table</h2>
-        <h5 style='color:crimson'><b>$pk</b> is the <b>PK</b> for this Table</h5>
-      </center>
-      <table>
-        <tr>"
+      if [ "$rtrn" == true ]; then
+        IFS='|' read -ra selected_headers_array <<< "$selected_headers"
+        selected_headers_table="<html>
+        <head>
+        <style>
+          body {
+            font-family: Arial, sans-serif;
+          }
+          table {
+            border-collapse: collapse;
+            width: 100%;
+          }
+          th, td {
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 8px;
+          }
+          th {
+            background-color: #f2f2f2;
+          }
+        </style>
+        </head>
+        <center>
+        <body>
+        <center>
+          <h2>$table_name Table</h2>
+          <h5 style='color:crimson'><b>$pk</b> is the <b>PK</b> for this Table</h5>
+        </center>
+        <table>
+          <tr>"
 
-      field_indices=()
-      for selected_header in "${selected_headers_array[@]}"; do
-        selected_headers_table+="<th>$selected_header</th>"
-        field_index=$(echo "$nf" | grep -n "$selected_header" | cut -d ":" -f 1)
-        field_indices+=("$field_index")
-      done
+        field_indices=()
+        for selected_header in "${selected_headers_array[@]}"; do
+          selected_headers_table+="<th>$selected_header</th>"
+          field_index=$(echo "$nf" | grep -n "$selected_header" | cut -d ":" -f 1)
+          field_indices+=("$field_index")
+        done
 
-      selected_headers_table+="<th>Actions</th>"
-      selected_headers_table+="</tr>"
+        selected_headers_table+="<th>Actions</th>"
+        selected_headers_table+="</tr>"
 
-    if [ "$DT" == "ID--Int--Auto--Inc." ] || [ "$DT" == "INT" ] || [ "$DT" == "Double" ]; then
-      if [ "$selected_op" == "==" ]; then
-        operator="-eq"
-      elif [ "$selected_op" == "!=" ]; then
-        operator="-ne"
-      elif [ "$selected_op" == ">" ]; then
-        operator="-gt"
-      elif [ "$selected_op" == "<" ]; then
-        operator="-lt"
-      elif [ "$selected_op" == ">=" ]; then
-        operator="-ge"
-      elif [ "$selected_op" == "<=" ]; then
-        operator="-le"
+      if [ "$DT" == "ID--Int--Auto--Inc." ] || [ "$DT" == "INT" ] || [ "$DT" == "Double" ]; then
+        if [ "$selected_op" == "==" ]; then
+          operator="-eq"
+        elif [ "$selected_op" == "!=" ]; then
+          operator="-ne"
+        elif [ "$selected_op" == ">" ]; then
+          operator="-gt"
+        elif [ "$selected_op" == "<" ]; then
+          operator="-lt"
+        elif [ "$selected_op" == ">=" ]; then
+          operator="-ge"
+        elif [ "$selected_op" == "<=" ]; then
+          operator="-le"
+        fi
+        while IFS= read -r line; do
+            IFS=";" read -ra fields_split <<< "$line"
+            if [ "${fields_split[$arg-1]}" $operator "$value" ]; then
+                selected_headers_table+="<tr>"
+                for field_index in "${hds[@]}"; do
+                    field_data=${fields_split[field_index-1]}
+                    selected_headers_table+="<td>$field_data</td>"
+                done
+                selected_headers_table+="<td>&#9997; &#128465;</td>"
+                selected_headers_table+="</tr>"
+            fi
+        done < "$data_file"
+
+      else
+        while IFS= read -r line; do
+            IFS=";" read -ra fields_split <<< "$line"
+            if [ "${fields_split[$arg-1]}" $selected_op "$value" ]; then
+                selected_headers_table+="<tr>"
+                for field_index in "${hds[@]}"; do
+                    field_data=${fields_split[field_index-1]}  # Fixed index
+                    selected_headers_table+="<td>$field_data</td>"
+                done
+                selected_headers_table+="<td>&#9997; &#128465;</td>"
+                selected_headers_table+="</tr>"
+            fi
+        done < "$data_file"
+
       fi
-      while IFS= read -r line; do
-          IFS=";" read -ra fields_split <<< "$line"
-          if [ "${fields_split[$arg-1]}" $operator "$value" ]; then
-              selected_headers_table+="<tr>"
-              for field_index in "${hds[@]}"; do
-                  field_data=${fields_split[field_index-1]}
-                  echo "$field_index: $field_data"
-                  selected_headers_table+="<td>$field_data</td>"
-              done
-              selected_headers_table+="<td>&#9997; &#128465;</td>"
-              selected_headers_table+="</tr>"
-          fi
-      done < "$data_file"
 
+
+        selected_headers_table+="</table>
+        </body>
+        </center>
+        </html>"
+
+      zenity --text-info --title="$table_name Table" --width=1080 --height=950 \
+        --html --filename=<(echo "$selected_headers_table") 2>>/dev/null
+
+      if [ $? -eq 1 ]; then
+        Menu_Table "$DB_name"
+      fi
+    
+
+    
     else
-      while IFS= read -r line; do
-          IFS=";" read -ra fields_split <<< "$line"
-          if [ "${fields_split[$arg-1]}" $selected_op "$value" ]; then
-              selected_headers_table+="<tr>"
-              for field_index in "${hds[@]}"; do
-                  field_data=${fields_split[field_index-1]}  # Fixed index
-                  selected_headers_table+="<td>$field_data</td>"
-              done
-              selected_headers_table+="<td>&#9997; &#128465;</td>"
-              selected_headers_table+="</tr>"
-          fi
-      done < "$data_file"
-
-    fi
-
-
-      selected_headers_table+="</table>
-      </body>
-      </center>
-      </html>"
-
-    zenity --text-info --title="$table_name Table" --width=1080 --height=950 \
-      --html --filename=<(echo "$selected_headers_table") 2>>/dev/null
-
-    if [ $? -eq 1 ]; then
-      Menu_Table "$DB_name"
+    zenity --error --width=400 --height=100  --text="Data Type Mismatch The Expected Value Must Be : $DT"
+            Select_Tb
     fi
   else
     Menu_Table "$DB_name"
   fi
-
 
 fi
 }
@@ -941,6 +954,7 @@ function Select_Without_Condition() {
     Select_All
   elif [ "$type" == "Columns" ]; then
     Select_Columns
+
   fi
 }
 

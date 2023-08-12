@@ -17,7 +17,7 @@ function Delete_Data() {
     nf=$(awk -F':' 'NR>3 {print NR-3":"$1":"$3}' "$data_file.md")
     index=$(echo "$nf" | awk -F':' '$3 == "y" { print $1 }')
     col=$(echo "$nf" | awk -F':' '$3 == "y" { print $2 }')
-    dv=$(zenity --entry \
+    dv=$(zenity --entry --width=400 --height=100 \
       --title="Delete Record" \
       --text="Enter Value Of PK($col) for The Record You Want To Delete")
     
@@ -29,15 +29,15 @@ function Delete_Data() {
       ltd=$(awk -v idx="$index" -v val="$dv" -F';' '$idx == val { print $0 }' "$data_file")
       echo "Line To Be Deleted : $ltd"
       
-      zenity --question --text="Are you sure you want to delete this record?"
+      zenity --question --width=400 --height=100  --text="Are you sure you want to delete this record?"
       response=$?
       
       if [ "$response" -eq 0 ]; then
         sed -i "\|$ltd|d" "$data_file"
-        zenity --info --text="Record Deleted Successfully"
+        zenity --info --width=400 --height=100  --text="Record Deleted Successfully"
         Menu_Table "$DB_name"
       else
-        zenity --info --text="You Chose Not To Delete The Record."
+        zenity --info --width=400 --height=100  --text="You Chose Not To Delete The Record."
         Menu_Table "$DB_name"
       fi
       
@@ -47,7 +47,7 @@ function Delete_Data() {
         Menu_Table "$DB_name"
       fi
     else
-      zenity --error --text="Data Type Mismatch The Expected Value Must Be : $DT"
+      zenity --error --width=400 --height=100  --text="Data Type Mismatch The Expected Value Must Be : $DT"
       Menu_Table "$DB_name"
     fi
   fi

@@ -1,10 +1,9 @@
 #!/bin/bash
 
 function Create_Table() {
-  table_name=$(zenity --forms \
+  table_name=$(zenity --entry --width=400 --height=100  \
     --title="Create Table" \
-    --text="Enter table name:" \
-    --add-entry="Table Name")
+    --text="Enter Table name:")
 
   if [ $? -eq 1 ]; then
    zenity --error --text="Table creation failed."
@@ -16,10 +15,9 @@ function Create_Table() {
   if [ "$rtrn" != true ]; then
     Create_Table
   else
-    num_columns=$(zenity --forms \
+    num_columns=$(zenity --entry --width=400 --height=100  \
       --title="Create Table $table_name" \
-      --text="Enter number of columns:" \
-      --add-entry="Number of Columns")
+      --text="Enter number of columns:" )
 
     if [ $? -eq 1 ]; then
       zenity --error --text="Table $table_name creation failed."
@@ -42,7 +40,7 @@ function Create_Table() {
       unique=()
 
       for ((i = 1; i <= num_columns; i++)); do
-        column_info=$(zenity --forms \
+        column_info=$(zenity --forms --width=300 --height=100 \
           --title="Create Table $table_name" \
           --text="Enter information for Column $i:" \
           --add-entry="Column Name" \
@@ -50,7 +48,7 @@ function Create_Table() {
           --add-entry="Unique (y/n)")
 
         if [ $? -eq 1 ]; then
-         zenity --error --text="Table $table_name creation failed."
+         zenity --error --width=400 --height=100 --text="Table $table_name creation failed."
          rm -r "$table_name"
          Create_Table
         fi
@@ -64,19 +62,19 @@ function Create_Table() {
           Create_Table
         else
           if [[ "$is_nullable" != "y" && "$is_nullable" != "n" ]]; then
-            zenity --error --text="Invalid value for Nullable in Column $i. Please enter 'y' or 'n'. Table $table_name creation failed."
+            zenity --error --width=400 --height=100 --text="Invalid value for Nullable in Column $i. Please enter 'y' or 'n'. Table $table_name creation failed."
             rm -r "$table_name"
             Create_Table
           fi
 
           if [[ "$is_unique" != "y" && "$is_unique" != "n" ]]; then
-            zenity --error --text="Invalid value for Unique in Column $i. Please enter 'y' or 'n'. Table $table_name creation failed."
+            zenity --error --width=400 --height=100 --text="Invalid value for Unique in Column $i. Please enter 'y' or 'n'. Table $table_name creation failed."
             rm -r "$table_name"
             Create_Table
           fi
 
           data_type_options=("ID--Int--Auto--Inc." "INT" "Double" "Varchar" "Enum" "Phone" "Email" "Password" "Date" "Current--Date--Time")
-          data_type=$(zenity --list \
+          data_type=$(zenity --list --width=300 --height=350 \
             --title="Create Table $table_name" \
             --text="Select data type for Column $i:" \
             --column="Data Type" "${data_type_options[@]}")
@@ -91,7 +89,7 @@ function Create_Table() {
             num_enum_values=$(zenity --entry --title="Enum Values" --text="Enter the number of ENUM values for $column_name:")
             rtrn=$(isNumber "$num_enum_values")
             if [ "$rtrn" == "false" ]; then
-              zenity --error --text="Must Enter A Valid Number."
+              zenity --error --width=400 --height=100  --text="Must Enter A Valid Number."
             else
               enum_values=()
               for ((j = 1; j <= num_enum_values; j++)); do
@@ -109,13 +107,13 @@ function Create_Table() {
         fi
       done
 
-      selected_pk_column=$(zenity --list \
+      selected_pk_column=$(zenity --list --width=300 --height=250 \
         --title="Create Table $table_name" \
         --text="Select the Primary Key column:" \
         --column="Column" "${columns[@]}")
 
       if [ $? -eq 1 ]; then
-        zenity --error --text="Table $table_name creation failed."
+        zenity --error --width=400 --height=100 --text="Table $table_name creation failed."
         rm -r "$table_name"
         Create_Table
       fi
@@ -129,7 +127,7 @@ function Create_Table() {
       done
 
       if [[ -z $selected_pk_column ]]; then
-        zenity --error --text="No Primary Key column selected. You must select at least one Primary Key. Table creation failed."
+        zenity --error --width=400 --height=100 --text="No Primary Key column selected. You must select at least one Primary Key. Table creation failed."
         Create_Table
         rm -r "$table_name"
       fi
@@ -139,7 +137,7 @@ function Create_Table() {
         for ((i = 0; i < ${#columns[@]}; i++)); do
           echo -e "${columns[i]}:${data_types[i]}:${primary_keys[i]}:${unique[i]}:${nullable[i]}" >> "$table_name/$table_name.md" $([[ "${data_types[i]}" == "Enum" ]] && echo ":${formatted_enum}")
         done
-        zenity --info --text="Table '$table_name' created successfully!"
+        zenity --info --width=400 --height=100 --text="Table '$table_name' created successfully!"
       else
         Create_Table
         rm -r "$table_name"
