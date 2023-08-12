@@ -188,9 +188,13 @@ function UpdateTb {
                 data2=${where_Arr[j]}
                 data3=${modified_Arr[j]}
                 
+                # echo "d1:"$data1
+                # echo "d2:"$data2
+                # echo "d3:"$data3
+                # echo "j:"$j
                 if [ "$data1" == "$data2" ]; then
                     echo $data3 >> tmp.txt
-                    j+=1
+                    j=$((j + 1))
                 else
                     echo $data1 >> tmp.txt
                 fi
@@ -209,7 +213,7 @@ function UpdateTb {
         if [ -f ./tmp.txt ]
             then rm ./tmp.txt
         fi
-         zenity --info --width=400 --height=100 --text="Table $table_name Updated Succesfully on Col($column_name) New Value($value)"
+         zenity --info --width=400 --height=100 --text="Table $table_name Updated Succesfully on Col($column_name) New Value($new_data)"
     else
          zenity --error --width=400 --height=100 --text="Data Type Mismatch The Expected Value Must Be : $DTcond"
         UpdateTb

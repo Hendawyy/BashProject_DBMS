@@ -232,6 +232,9 @@ function data_type {
   if  [[ $input =~ ^[1-9][0-9]*$ ]]
   then
     echo "int"
+  elif [[ $input =~ $phone_pattern ]]
+  then
+    echo "phone"
   elif [[ $input =~ ^[-+]?[0-9]+\.?[0-9]*$ ]]
   then
     echo "double"
@@ -250,9 +253,6 @@ function data_type {
   elif [[ $input =~ $enum_pattern ]]
   then
     echo "enum"
-  elif [[ $input =~ $phone_pattern ]]
-  then
-    echo "phone"
   else
     echo "text"
   fi
@@ -308,6 +308,7 @@ function data_type_match {
     fi
   else
     data_type=$(data_type "$*")
+    # echo $data_type
     if [ "$lower_expected" == "$data_type" ]; then
         echo true
     else
@@ -317,7 +318,7 @@ function data_type_match {
 
 }
 
-#data_type_match "date" "2023-13-15"
+# data_type_match "Phone" "01011339798"
 
 
 
@@ -341,11 +342,12 @@ function list_tables() {
 
 
 function check_for_unique {
+   
     col=$1
     file=$2
     shift 2
     data=$*
-    count=`cat $file |cut -d ; -f $col| grep -i ^"$data"$ | wc -l`
+    count=$(cat $file | cut -d ';' -f $col | grep -i ^"$data"$ | wc -l)
     if [ $count -eq 0 ]
     then
         echo true
@@ -708,7 +710,13 @@ function Select_With_Condition() {
         fi
         while IFS= read -r line; do
           IFS=";" read -ra fields <<< "$line"
-          if [ ${fields[$arg-1]} $operator "$value" ]; then
+          if [ "$DT" == "Double" ]; then
+            ASDasd=$(echo "${fields[$arg-1]} $selected_op $value" | bc)
+          else
+             ASDasd=$(echo "${fields[$arg-1]} $operator $value")
+          fi
+          echo $ASDasd
+          if [ $ASDasd ]; then
             formatted_data+="<tr>"
             for ((i = 0; i < num_fields; i++)); do
               formatted_data+="<td>${fields[i]}</td>"
@@ -891,7 +899,13 @@ function Select_With_Condition() {
         fi
         while IFS= read -r line; do
             IFS=";" read -ra fields_split <<< "$line"
-            if [ "${fields_split[$arg-1]}" $operator "$value" ]; then
+            if [ "$DT" == "Double" ]; then
+              ASDasd=$(echo "${fields[$arg-1]} $selected_op $value" | bc)
+            else
+              ASDasd=$(echo "${fields[$arg-1]} $operator $value")
+            fi
+            echo $ASDasd
+            if [ $ASDasd ]; then
                 selected_headers_table+="<tr>"
                 for field_index in "${hds[@]}"; do
                     field_data=${fields_split[field_index-1]}
@@ -905,7 +919,7 @@ function Select_With_Condition() {
       else
         while IFS= read -r line; do
             IFS=";" read -ra fields_split <<< "$line"
-            if [ "${fields_split[$arg-1]}" $selected_op "$value" ]; then
+            if [ "${fields_split[$arg-1]}" "$selected_op" "$value" ]; then
                 selected_headers_table+="<tr>"
                 for field_index in "${hds[@]}"; do
                     field_data=${fields_split[field_index-1]}  # Fixed index
@@ -989,7 +1003,6 @@ function insert_into {
         data=`awk -v line=$i '{if (NR==line) print $0}' $file_path/tmp.data`
         col=$(($i+3))
         prkey=`awk -F ":" -v line=$(($i+3)) '{if(NR==line) print $3}' $meta_data_file`
-        auto_inc=`awk -F ":" -v line=$(($i+3)) '{if(NR==line) print $4}' $meta_data_file`
         unq=`awk -F ":" -v line=$(($i+3)) '{if(NR==line) print $5}' $meta_data_file`
         not_nul=`awk -F ":" -v line=$(($i+3)) '{if(NR==line) print $6}' $meta_data_file`
         data_col=$i

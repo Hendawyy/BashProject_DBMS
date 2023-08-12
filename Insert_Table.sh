@@ -13,16 +13,26 @@ function Insert_Table() {
   if [ $? -eq 1 ]; then
     Menu_Table $DB_name
   fi
+    column_name="${column_names[i]}"
 
   table_name=$selected_tb
 
   column_names=($(awk -F ':' 'NR > 3 {print $1}' "../$DB_name/$table_name/$table_name.md"))
   data_types=($(awk -F ':' 'NR > 3 {print $2}' "../$DB_name/$table_name/$table_name.md"))
-
+  PKin=($(awk -F ':' 'NR > 3 {print $3}' "../$DB_name/$table_name/$table_name.md"))
+  Uniquein=($(awk -F ':' 'NR > 3 {print $4}' "../$DB_name/$table_name/$table_name.md"))
+  nullablen=($(awk -F ':' 'NR > 3 {print $5}' "../$DB_name/$table_name/$table_name.md"))
+ 
   column_data=()
+  flag=0
   for i in "${!column_names[@]}"; do
     column_name="${column_names[i]}"
     data_type="${data_types[i]}"
+    PKz="${PKin[i]}"
+    Uniquez="${Uniquein[i]}"
+    nullablez="${nullablen[i]}"
+    colzzz=($(awk -F ':' -v cn=$column_name '$1 == cn  {print NR-3}' "../$DB_name/$table_name/$table_name.md"))
+
     # echo $column_name: $data_type
     if [[ "$data_type" == "ID--Int--Auto--Inc." ]]; then
       last_value=$(tail -n 1 "../$DB_name/$table_name/$table_name" | cut -d ';' -f 1)
@@ -105,12 +115,47 @@ function Insert_Table() {
       current_datetime=$(date +"%Y-%m-%d---%H:%M:%S")
       column_data+=("$current_datetime")
     fi
+    #echo echo $colzzz:"cv":$column_value
+     if [ $Uniquez == "y" ]
+        then
+            asden=$(check_for_unique "$colzzz" "$table_name/$table_name" $column_value)
+            echo "asddas":$asden
+            if [ $asden == "false" ]
+            then
+                zenity --error --width=400 --height=100 --text="Unique values can't be repeated"
+                flag=1
+                Insert_Table
+            fi
+        fi
+        if [ $nullablez == "y" ]
+        then
+            if [ $(check_for_not_null $column_value) == false ]
+            then
+                zenity --error --width=400 --height=100 --text="This argument is required and can't be null"
+                flag=1
+                Insert_Table
+            fi
+        fi
+        if [ $PKz == "y" ]
+        then
+            if [ $(check_for_pk $colzzz "$table_name/$table_name" $column_value) == false ]
+            then
+                zenity --error --width=400 --height=100 --text="Value doesn't meet Primary Key constraints"
+                flag=1
+                Insert_Table
+            fi
+        fi
   done
-
-  insert_line=$(IFS=';'; echo "${column_data[*]}")
-  echo "$insert_line" >> "../$DB_name/$table_name/$table_name"
-
-  zenity --info --width=400 --height=100 --text="Data inserted successfully!"
+  if [[ $flag -eq 0 ]]
+    then
+    insert_line=$(IFS=';'; echo "${column_data[*]}")
+    echo "$insert_line" >> "../$DB_name/$table_name/$table_name"
+    zenity --info --width=400 --height=100 --text="Data inserted successfully!"
+    Menu_Table $DB_name
+  else
+     zenity --error --width=400 --height=100 --text="Data insertion Failed!"
+     Insert_Table
+  fi
 }
 
 Insert_Table
