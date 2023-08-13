@@ -54,7 +54,7 @@ We aim to continually improve and refine our project.
 You will be surprised we aim to please XD!
 
 ## Acknowledgments
-This site was built using [Zenity Manual](ttps://help.gnome.org/users/zenity/stable/).
+[Zenity Manual](ttps://help.gnome.org/users/zenity/stable/).
 
 ## Project Status
 Completed Projected
