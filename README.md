@@ -2,7 +2,7 @@
 
 ## Description
 
-This project aims to develop a Database Management System (DBMS) that enables users to store and retrieve data from a hard disk. The project is built using Bash scripting and provides a command-line interface (CLI) for interacting with the DBMS.
+This project aims to develop a Database Management System (DBMS) that enables users to store and retrieve data from a hard disk. The project is built using Bash scripting and provides a Graphical user interface GUI) for interacting with the DBMS.
 
 ## Installation
 
