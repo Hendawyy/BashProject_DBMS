@@ -2,21 +2,63 @@
 
 ## Description
 
+This project aims to develop a Database Management System (DBMS) that enables users to store and retrieve data from a hard disk. The project is built using Bash scripting and provides a command-line interface (CLI) for interacting with the DBMS.
+
 ## Installation
+
+### Clone the Repository:
+
+```
+git clone git@github.com:Hendawyy/BashProject_DBMS.git
+cd BashProject_DBMS
+```
+
+### Install Zenity:
+
+Ensure you have Zenity version 3.42.1 or higher installed. You can check your current version using:
+```
+zenity --version
+```
+If Zenity is not installed or needs an upgrade, you can do so using your distribution's package manager:
+
+On Ubuntu:
+```
+sudo apt-get update
+sudo apt-get install zenity
+```
+On CentOS:
+```
+sudo dnf install zenity-3.42.1
+# or
+sudo yum install zenity-3.42.1
+```
 
 ## Usage
 
-## Supported Commands
+To run the main script, execute the dbmenu.sh script using either of the following commands:
+```
+bash dbmenu.sh
+# or
+./dbmenu.sh
+```
+You'll be prompted to choose actions from the menu. Each choice sources another shell file containing a function. To exit, press "Cancel" on the DB menu. "Cancel" can also act as a back button to the previous prompt.
 
 ## Data Storage
 
+Files are organized with each feature in the DBMS having its own .sh script file. 
+The root directory contains all these script files, along with a components.sh file that holds reusable functions.(As much as we could NO OOP)
+
 ## Limitations
 
+We aim to continually improve and refine our project.
+You will be surprised we aim to please XD!
+
 ## Acknowledgments
+This site was built using [Zenity Manual](ttps://help.gnome.org/users/zenity/stable/).
 
 ## Project Status
+Completed Projected
 
-## Active Development.
 
 ## Getting Started
 
