@@ -60,7 +60,6 @@ This site was built using [Zenity Manual](ttps://help.gnome.org/users/zenity/sta
 Completed Projected
 
 
-## Getting Started
 
 ### GUI Considerations
 
