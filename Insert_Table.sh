@@ -38,9 +38,15 @@ function Insert_Table() {
       last_value=$(tail -n 1 "../$DB_name/$table_name/$table_name" | cut -d ';' -f 1)
       if [[ -z "$last_value" ]]; then
         column_data+=("1")
+        echo "lv:"$last_value
+        echo "cd:" $column_data
       else
         new_value=$((last_value + 1))
         column_data+=("$new_value")
+        echo "lv:"$last_value
+        echo "NV:" $new_value
+        echo "cd:" $column_data
+        continue
       fi
     elif [[ "$data_type" == "INT" ]]; then
     column_value=$(zenity --width=400 --height=100 --entry --title="Enter Value" --text="Enter value for $column_name (INT):")
@@ -119,7 +125,7 @@ function Insert_Table() {
      if [ $Uniquez == "y" ]
         then
             asden=$(check_for_unique "$colzzz" "$table_name/$table_name" $column_value)
-            echo "asddas":$asden
+            # echo "asddas":$asden
             if [ $asden == "false" ]
             then
                 zenity --error --width=400 --height=100 --text="Unique values can't be repeated"
