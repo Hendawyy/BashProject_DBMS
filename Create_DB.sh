@@ -26,7 +26,8 @@ while true; do
             else
                 rtrn=$(check_special_char $db_namez)
                 if [ "$rtrn" == true ]; then
-                    zenity --error --text="invalid name, avoid using special characters like: ws, &, *, @"
+                    zenity --error --text="invalid name, avoid using special characters like: ws, &amp;, *, @"
+
                 else
                     mkdir -p "Databases/$db_namez"
                     zenity --info --width=400 --height=100  --text="Database $db_namez.db created successfully!"

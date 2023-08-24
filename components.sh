@@ -3,7 +3,7 @@
 
 
 function check_special_char {
-  x=$1
+  x=$*
   if [[ $x =~ [\!\'\"\^\\[\#\`\~\$\%\=\+\<\>\|\:\ \(\)\@\;\?\&\*\\\/]+ ]]
   then
     echo true
@@ -25,7 +25,7 @@ function check_if_name_starts_with_number {
 
 
 function check_if_dir_exists {
-	if [[ -d "$1" ]]
+	if [[ -d "$*" ]]
 	then
 		echo true
 	else
@@ -47,6 +47,9 @@ function list_databases() {
     DBmenu
   fi
 
+  if [ -z "$selected_db" ]; then
+    DBmenu
+  fi
   zenity --question --width=400 --height=100  --text="Do you want to connect to '$selected_db'?" 
   response=$?
   if [ $response -eq 0 ]; then
@@ -59,13 +62,13 @@ function list_databases() {
 }
 
 function connect_to_database() {
-  local db_name=$(echo "$1" | sed 's/\.db$//')
+  db_name=$(echo "$1" | sed 's/\.db$//')
 
   cd "Databases/$db_name"
   zenity --info --width=400 --height=100 \
   --text="Connected to the database: $db_name"
   echo "Current directory: $(pwd)"
-  source ../../Table_menu.sh
+  source ../../Table_menu.sh $db_name
 }
 
 function check_for_empty_string {

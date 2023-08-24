@@ -38,14 +38,15 @@ function Insert_Table() {
       last_value=$(tail -n 1 "../$DB_name/$table_name/$table_name" | cut -d ';' -f 1)
       if [[ -z "$last_value" ]]; then
         column_data+=("1")
-        echo "lv:"$last_value
-        echo "cd:" $column_data
+        # echo "lv:"$last_value
+        # echo "cd:" $column_data
+        continue #Added This during debugging Produced error on PK
       else
         new_value=$((last_value + 1))
         column_data+=("$new_value")
-        echo "lv:"$last_value
-        echo "NV:" $new_value
-        echo "cd:" $column_data
+        # echo "lv:"$last_value
+        # echo "NV:" $new_value
+        # echo "cd:" $column_data
         continue
       fi
     elif [[ "$data_type" == "INT" ]]; then

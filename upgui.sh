@@ -137,11 +137,11 @@ function UpdateTb {
     cat $table_path/$table_name > ./update.tmp
     operators=("==" "!=" ">" "<" ">=" "<=")
 
-    if [ "$DTcond" == "ID--Int--Auto--Inc." ] || [ "$DT" == "INT" ] || [ "$DT" == "Double" ]; then
-        operators=("==" "!=" ">" "<" ">=" "<=")
-    else
-        operators=("==" "!=" ">" "<")
-    fi
+    # if [ "$DTcond" == "ID--Int--Auto--Inc." ] || [ "$DT" == "INT" ] || [ "$DT" == "Double" ]; then
+    #     operators=("==" "!=" ">" "<" ">=" "<=")
+    # else
+    #     operators=("==" "!=" ">" "<")
+    # fi
 
     selected_op=$(zenity --list  --width=300 --height=250 \
       --title="List of Operators" \
@@ -170,41 +170,57 @@ function UpdateTb {
         where $table_path/$table_name $col_cond "$operator" $cond_value > ./update.tmp
         number_of_affected_line=$(cat ./update.tmp | wc -l)
         uniqueness_check=$(cat $table_path/$table_name.md | awk -F : -v col=$(($colxn + 3)) '{if(NR==col && ($3=="y"||$5=="y")) print "unique"}')
-
+        # echo $uniqueness_check
         if [ "$uniqueness_check" == "unique" ] && [ $number_of_affected_line -gt 1 ]; then
-                        echo "Unique constraint is applied on the $col_name column, try updating one value at a time"
-        else
-            cat ./update.tmp | awk -F ";" -v new_data=$new_data -v col=$colxn 'BEGIN { OFS = ";"; ORS = "\n" }{
-                $col=new_data
-                print $0
-            }' > ./awk.tmp
-            readarray -t where_Arr < ./update.tmp
-            readarray -t modified_Arr < ./awk.tmp
-            readarray -t old_data_Arr < $table_path/$table_name
-            j=0
-
-            for((i=0;i<${#old_data_Arr[@]};i++)); do
-                data1=${old_data_Arr[i]} 
-                data2=${where_Arr[j]}
-                data3=${modified_Arr[j]}
-                
-                # echo "d1:"$data1
-                # echo "d2:"$data2
-                # echo "d3:"$data3
-                # echo "j:"$j
-                if [ "$data1" == "$data2" ]; then
-                    echo $data3 >> tmp.txt
-                    j=$((j + 1))
-                else
-                    echo $data1 >> tmp.txt
-                fi
-            done
-            cat tmp.txt > $table_path/$table_name
+            echo "Unique constraint is applied on the $col_name column, try updating one value at a time"
+            rm ./update.tmp
+            UpdateTb
+        elif [ "$uniqueness_check" == "unique" ]; then
+            rtrn=$(check_for_unique "$colxn" "$table_path/$table_name" "$new_data")
+            # echo "$rtrn"
+            if [ "$rtrn" == false ]; then
+                zenity --error --width=400 --height=100 --text="New Value Doesn't meet Uniqueness or PK constraints"
+                rm ./update.tmp
+                UpdateTb
+            fi
         fi
 
-        if [ -f ./update.tmp ]
-            then rm ./update.tmp
+        cat ./update.tmp | awk -F ";" -v new_data=$new_data -v col=$colxn 'BEGIN { OFS = ";"; ORS = "\n" }{
+            $col=new_data
+            print $0
+        }' > ./awk.tmp
+        readarray -t where_Arr < ./update.tmp
+        readarray -t modified_Arr < ./awk.tmp
+        readarray -t old_data_Arr < $table_path/$table_name
+        j=0
+
+        for((i=0;i<${#old_data_Arr[@]};i++)); do
+            data1=${old_data_Arr[i]} 
+            data2=${where_Arr[j]}
+            data3=${modified_Arr[j]}
+            
+            # echo "d1:"$data1
+            # echo "d2:"$data2
+            # echo "d3:"$data3
+            # echo "j:"$j
+            if [ "$data1" == "$data2" ]; then
+                echo $data3 >> tmp.txt
+                j=$((j + 1))
+            else
+                echo $data1 >> tmp.txt
+            fi
+        done
+        cat tmp.txt > $table_path/$table_name
+       if [ -f ./update.tmp ]; then
+            if [ $number_of_affected_line -ge 1 ]; then
+                rm ./update.tmp
+                zenity --info --width=400 --height=100 --text="Table $table_name Updated Successfully on Col($column_name) New Value($new_data)\nNumber Of Affected rows ($number_of_affected_line) rows were Updated"
+            else
+                rm ./update.tmp
+                zenity --warning --width=400 --height=100 --text="Table $table_name Failed to Update No Data was found on the given Condition($value)\nNumber Of Affected rows (0) rows were Updated"
+            fi
         fi
+
 
         if [ -f ./awk.tmp ]
             then rm ./awk.tmp
@@ -213,7 +229,6 @@ function UpdateTb {
         if [ -f ./tmp.txt ]
             then rm ./tmp.txt
         fi
-         zenity --info --width=400 --height=100 --text="Table $table_name Updated Succesfully on Col($column_name) New Value($new_data)"
     else
          zenity --error --width=400 --height=100 --text="Data Type Mismatch The Expected Value Must Be : $DTcond"
         UpdateTb

@@ -40,6 +40,7 @@ function update {
     then
         echo "column $col_name doesn't exist"
     else
+    # update Trial set Name = Mostafa where ID "=" 9
     operator="$2"
     cond_value=$3
     where $table_path/$table_name $col_num "$operator" $cond_value > ./update.tmp

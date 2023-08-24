@@ -28,7 +28,7 @@ function Create_Table() {
     if [ "$rtrn" == "false" ]; then
       zenity --error --text="Must Enter A Valid Number."
     else
-      mkdir -p "$table_name"
+      mkdir "$table_name"
       touch "$table_name/$table_name" "$table_name/$table_name.md"
       echo "Table Name:$table_name" > "$table_name/$table_name.md"
       echo "Number of Columns:$num_columns" >> "$table_name/$table_name.md"
@@ -59,6 +59,7 @@ function Create_Table() {
 
         rtrn=$(Tb_txf "$column_name")
         if [ "$rtrn" != true ]; then
+          rm -r "$table_name"
           Create_Table
         else
           if [[ "$is_nullable" != "y" && "$is_nullable" != "n" ]]; then
@@ -128,8 +129,8 @@ function Create_Table() {
 
       if [[ -z $selected_pk_column ]]; then
         zenity --error --width=400 --height=100 --text="No Primary Key column selected. You must select at least one Primary Key. Table creation failed."
-        Create_Table
         rm -r "$table_name"
+        Create_Table
       fi
 
       check_repeated_columns "${columns[@]}"
@@ -139,8 +140,8 @@ function Create_Table() {
         done
         zenity --info --width=400 --height=100 --text="Table '$table_name' created successfully!"
       else
-        Create_Table
         rm -r "$table_name"
+        Create_Table
       fi
     fi
   fi
