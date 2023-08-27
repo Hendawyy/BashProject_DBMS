@@ -33,7 +33,7 @@ function Menu_Table() {
                 "Delete From Table" )
                     source ../../Delete_Data.sh;;
                 "Update Table" )
-                    source ../../upgui.sh;;
+                    source ../../Update_Table.sh;;
                 "Disconnect From Database" )
                     cd ../..
                     echo "Current directory: $(pwd)"
