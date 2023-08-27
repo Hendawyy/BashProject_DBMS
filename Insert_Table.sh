@@ -13,7 +13,6 @@ function Insert_Table() {
   if [ $? -eq 1 ]; then
     Menu_Table $DB_name
   fi
-    column_name="${column_names[i]}"
 
   table_name=$selected_tb
 
